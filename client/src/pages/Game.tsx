@@ -3,21 +3,21 @@ import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Rocket, Star, Trophy, ArrowLeft, Clock, Zap } from "lucide-react";
+import { ArrowLeft, Clock, Zap, Award } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Keypad } from "@/components/game/Keypad";
-import { generateProblem, type Operation, type Difficulty, type Problem } from "@/lib/game-logic";
-import { Progress } from "@/components/ui/progress";
+import { generateProblem, type Operation, type Problem } from "@/lib/game-logic";
 import { cn } from "@/lib/utils";
 
 export default function Game() {
   const [location, setLocation] = useLocation();
   
-  // Parse query params manually since wouter's useSearch is minimal
   const searchParams = new URLSearchParams(window.location.search);
   const mode = (searchParams.get("mode") as 'practice' | 'time-attack') || 'practice';
   const op = (searchParams.get("op") as Operation) || 'multiply';
-  const diff = (searchParams.get("diff") as Difficulty) || 'cadet';
+  // Parse tables from URL
+  const tablesParam = searchParams.get("tables");
+  const tables = tablesParam ? tablesParam.split(',').map(Number) : [1,2,3,4,5,6,7,8,9,10,11,12];
 
   const [problem, setProblem] = useState<Problem | null>(null);
   const [input, setInput] = useState("");
@@ -27,12 +27,10 @@ export default function Game() {
   const [feedback, setFeedback] = useState<'none' | 'correct' | 'wrong'>('none');
   const [streak, setStreak] = useState(0);
 
-  // Initialize
   useEffect(() => {
     nextProblem();
   }, []);
 
-  // Timer for Time Attack
   useEffect(() => {
     if (mode === 'time-attack' && gameState === 'playing' && timeLeft > 0) {
       const timer = setInterval(() => {
@@ -49,7 +47,7 @@ export default function Game() {
   }, [mode, gameState, timeLeft]);
 
   const nextProblem = () => {
-    setProblem(generateProblem(op, diff));
+    setProblem(generateProblem(op, tables));
     setInput("");
     setFeedback('none');
   };
@@ -61,7 +59,8 @@ export default function Game() {
         particleCount: 200,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#FFD700', '#00FFFF', '#FF00FF']
+        colors: ['#55ff55', '#55ffff', '#ff5555', '#ffffff'],
+        shapes: ['square']
       });
     }
   };
@@ -81,22 +80,20 @@ export default function Game() {
 
     const val = parseInt(input);
     if (val === problem.answer) {
-      // Correct
-      setScore((s) => s + 10 + (streak * 2)); // Bonus for streak
+      setScore((s) => s + 10 + (streak * 2));
       setStreak((s) => s + 1);
       setFeedback('correct');
       confetti({
-        particleCount: 50,
-        spread: 50,
-        origin: { y: 0.7 },
-        colors: ['#00FFFF', '#FFFFFF']
+        particleCount: 30,
+        spread: 40,
+        origin: { y: 0.6 },
+        colors: ['#55ff55', '#ffffff'],
+        shapes: ['square']
       });
-      setTimeout(nextProblem, 800);
+      setTimeout(nextProblem, 600);
     } else {
-      // Wrong
       setFeedback('wrong');
       setStreak(0);
-      // Shake effect logic handled by framer-motion variants
       setTimeout(() => {
         setInput("");
         setFeedback('none');
@@ -106,26 +103,33 @@ export default function Game() {
 
   if (gameState === 'finished') {
     return (
-      <div className="min-h-screen bg-[url('/assets/hero-space-bg.png')] bg-cover bg-center flex items-center justify-center p-4">
-        <Card className="max-w-md w-full bg-black/40 backdrop-blur-xl border-white/20 p-8 text-center space-y-8">
-          <motion.div 
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="space-y-4"
-          >
-            <Trophy className="w-24 h-24 text-yellow-400 mx-auto drop-shadow-[0_0_15px_rgba(250,204,21,0.5)]" />
-            <h1 className="text-4xl font-display text-white">Mission Complete!</h1>
-            <div className="text-6xl font-bold text-primary font-body">{score}</div>
-            <p className="text-white/60">Total Score</p>
-          </motion.div>
+      <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center flex items-center justify-center p-4">
+        <div className="absolute inset-0 bg-black/60" />
+        <Card className="max-w-md w-full bg-[#c6c6c6] border-4 border-black p-0 rounded-none relative z-10 shadow-[10px_10px_0_#000000]">
+          <div className="bg-[#8b8b8b] p-3 border-b-4 border-black text-center">
+            <h2 className="text-white font-display text-lg">Mission Report</h2>
+          </div>
+          
+          <div className="p-8 text-center space-y-8">
+            <motion.div 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              className="space-y-4"
+            >
+              <Award className="w-24 h-24 text-[#ffd700] mx-auto drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
+              <h1 className="text-2xl font-display text-[#3f3f3f] uppercase">Level Complete!</h1>
+              <div className="text-6xl font-display text-[#5555ff] drop-shadow-[2px_2px_0_#000000]">{score}</div>
+              <p className="text-black/60 font-body text-xl">Total Score</p>
+            </motion.div>
 
-          <div className="flex gap-4 justify-center">
-            <Button variant="outline" size="lg" onClick={() => setLocation('/')}>
-              <ArrowLeft className="mr-2 h-5 w-5" /> Base
-            </Button>
-            <Button size="lg" onClick={() => window.location.reload()}>
-              <Rocket className="mr-2 h-5 w-5" /> Play Again
-            </Button>
+            <div className="flex flex-col gap-4">
+              <Button size="lg" className="h-16 text-xl font-display bg-[#55ff55] hover:bg-[#66ff66] text-black border-4 border-black rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none" onClick={() => window.location.reload()}>
+                 Play Again
+              </Button>
+              <Button variant="outline" size="lg" className="h-16 text-xl font-display bg-[#c6c6c6] hover:bg-[#d6d6d6] text-[#3f3f3f] border-4 border-[#3f3f3f] rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.2)] active:translate-y-1 active:shadow-none" onClick={() => setLocation('/')}>
+                <ArrowLeft className="mr-2 h-5 w-5" /> Base
+              </Button>
+            </div>
           </div>
         </Card>
       </div>
@@ -133,78 +137,93 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/assets/hero-space-bg.png')] bg-cover bg-center flex flex-col items-center p-4">
+    <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center flex flex-col items-center p-4 font-body">
+      <div className="absolute inset-0 bg-black/20 pointer-events-none" />
+
       {/* Header */}
-      <div className="w-full max-w-2xl flex justify-between items-center mb-8 bg-black/30 backdrop-blur-md p-4 rounded-2xl border border-white/10">
+      <div className="w-full max-w-2xl flex justify-between items-center mb-8 relative z-10">
         <Link href="/">
-          <Button variant="ghost" size="icon" className="text-white hover:bg-white/10">
-            <ArrowLeft />
+          <Button className="bg-[#c6c6c6] hover:bg-[#d6d6d6] border-4 border-black text-black rounded-none shadow-[4px_4px_0_#000000] h-12 w-12 p-0">
+            <ArrowLeft className="w-6 h-6" />
           </Button>
         </Link>
         
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-2 text-yellow-400">
-            <Star className="fill-current" />
-            <span className="text-2xl font-bold font-body">{score}</span>
+        <div className="flex items-center gap-4 bg-[#000000]/60 p-2 border-4 border-white/20 backdrop-blur-sm rounded-none">
+          <div className="flex items-center gap-2 px-3">
+            <span className="text-yellow-400 font-display text-sm">SCORE</span>
+            <span className="text-2xl font-display text-white">{score}</span>
           </div>
           
           {mode === 'time-attack' && (
-            <div className="flex items-center gap-2 text-primary">
-              <Clock />
-              <span className={`text-2xl font-bold font-body ${timeLeft < 10 ? 'text-red-500 animate-pulse' : ''}`}>
-                {timeLeft}s
+            <div className="flex items-center gap-2 px-3 border-l-4 border-white/20">
+              <Clock className="text-white w-5 h-5" />
+              <span className={`text-2xl font-display ${timeLeft < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                {timeLeft}
               </span>
             </div>
           )}
 
           {streak > 2 && (
-             <div className="flex items-center gap-1 text-orange-400 animate-pulse">
+             <div className="flex items-center gap-1 px-3 border-l-4 border-white/20 text-orange-400 animate-pulse">
                <Zap className="fill-current w-5 h-5" />
-               <span className="font-bold">x{streak}</span>
+               <span className="font-display">x{streak}</span>
              </div>
           )}
         </div>
       </div>
 
       {/* Game Area */}
-      <div className="flex-1 w-full max-w-md flex flex-col justify-center gap-8">
+      <div className="flex-1 w-full max-w-md flex flex-col justify-center gap-8 relative z-10">
         
         {/* Mascot & Problem */}
-        <div className="relative">
+        <div className="relative mt-8">
           <motion.img 
-            src="/assets/mascot-robot.png" 
-            alt="Robot"
-            animate={{ y: [0, -20, 0] }}
-            transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
-            className="w-32 h-32 absolute -top-24 -right-4 drop-shadow-[0_0_20px_rgba(0,255,255,0.3)]"
+            src="/assets/minecraft-character.png" 
+            alt="Character"
+            animate={{ y: [0, -15, 0] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+            className="w-40 absolute -top-32 left-1/2 -translate-x-1/2 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] z-20"
           />
           
           <AnimatePresence mode="wait">
             <motion.div
               key={problem?.display}
-              initial={{ scale: 0.8, opacity: 0 }}
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
               animate={{ 
                 scale: 1, 
-                opacity: 1,
+                opacity: 1, 
+                y: 0,
                 x: feedback === 'wrong' ? [0, -10, 10, -10, 10, 0] : 0 
               }}
-              exit={{ scale: 1.2, opacity: 0 }}
-              transition={{ type: "spring" }}
+              exit={{ scale: 1.1, opacity: 0 }}
+              transition={{ type: "spring", stiffness: 300, damping: 20 }}
               className={cn(
-                "bg-card/80 backdrop-blur-xl border-2 rounded-[2rem] p-12 text-center shadow-2xl relative overflow-hidden",
-                feedback === 'correct' ? "border-green-500 bg-green-500/10" : "border-white/10",
-                feedback === 'wrong' ? "border-red-500 bg-red-500/10" : ""
+                "bg-[#c6c6c6] border-[6px] rounded-none p-8 text-center shadow-[10px_10px_0_rgba(0,0,0,0.6)] relative z-10 mt-8",
+                feedback === 'correct' ? "border-[#55ff55]" : "border-black",
+                feedback === 'wrong' ? "border-[#ff5555]" : ""
               )}
             >
-              <div className="text-6xl md:text-7xl font-bold text-white font-body tracking-wider">
-                {problem ? (
-                  <>
-                    {problem.display.split('?')[0]}
-                    <span className="text-primary border-b-4 border-primary/50 min-w-[2ch] inline-block px-2">
-                      {input || "?"}
-                    </span>
-                  </>
-                ) : "Loading..."}
+              {/* Wooden Sign visual inside */}
+              <div className="bg-[#a0522d] border-4 border-[#6d371e] p-6 shadow-[inset_0_0_20px_rgba(0,0,0,0.4)] relative">
+                  {/* Nail details */}
+                  <div className="absolute top-2 left-2 w-2 h-2 bg-[#4a2615] rounded-full opacity-50" />
+                  <div className="absolute top-2 right-2 w-2 h-2 bg-[#4a2615] rounded-full opacity-50" />
+                  <div className="absolute bottom-2 left-2 w-2 h-2 bg-[#4a2615] rounded-full opacity-50" />
+                  <div className="absolute bottom-2 right-2 w-2 h-2 bg-[#4a2615] rounded-full opacity-50" />
+
+                  <div className="text-5xl md:text-6xl font-display text-white tracking-widest drop-shadow-[3px_3px_0_#000000]">
+                    {problem ? (
+                      <div className="flex items-center justify-center gap-4">
+                        <span>{problem.display.split('?')[0]}</span>
+                        <span className={cn(
+                            "bg-black/30 min-w-[1.5em] px-2 border-b-4",
+                            input ? "border-white" : "border-white/20 animate-pulse"
+                        )}>
+                          {input || "?"}
+                        </span>
+                      </div>
+                    ) : "..."}
+                  </div>
               </div>
             </motion.div>
           </AnimatePresence>

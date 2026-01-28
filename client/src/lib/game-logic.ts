@@ -1,5 +1,4 @@
 export type Operation = 'multiply' | 'divide';
-export type Difficulty = 'cadet' | 'pilot' | 'commander';
 
 export interface Problem {
   a: number;
@@ -9,31 +8,47 @@ export interface Problem {
   display: string;
 }
 
-export const generateProblem = (operation: Operation, difficulty: Difficulty): Problem => {
-  let min = 1;
-  let max = 5;
+export const generateProblem = (operation: Operation, selectedTables: number[]): Problem => {
+  // Default to 1-12 if nothing selected (shouldn't happen with UI validation)
+  const tables = selectedTables.length > 0 ? selectedTables : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+  
+  // Pick one number from the selected tables
+  const a = tables[Math.floor(Math.random() * tables.length)];
+  
+  // Pick the second number randomly from 1 to 12
+  const b = Math.floor(Math.random() * 12) + 1;
 
-  if (difficulty === 'pilot') max = 9;
-  if (difficulty === 'commander') max = 12;
-
-  // Ensure we don't just get 1x1 all the time, add some randomness weighting if needed
-  // For now, simple random is fine for a 7yo.
-
-  const a = Math.floor(Math.random() * (max - min + 1)) + min;
-  const b = Math.floor(Math.random() * (max - min + 1)) + min;
+  // Randomize order for multiplication so it's not always "Table x Random"
+  // e.g. 5x3 or 3x5
+  const swap = Math.random() > 0.5;
+  const first = swap ? b : a;
+  const second = swap ? a : b;
 
   if (operation === 'multiply') {
     return {
-      a,
-      b,
-      answer: a * b,
+      a: first,
+      b: second,
+      answer: first * second,
       operation,
-      display: `${a} × ${b} = ?`
+      display: `${first} × ${second} = ?`
     };
   } else {
-    // Division: Ensure integer result.
-    // Create multiplication first: a * b = product.
-    // Problem: product / a = b
+    // Division
+    // Ensure integer result.
+    // Problem: (a * b) / a = b
+    // The "dividend" should be a multiple of one of the selected tables.
+    
+    // For division, "practicing the 5 times table" usually means dividing BY 5, 
+    // or dividing a multiple OF 5.
+    // Let's standardize: Dividend / Divisor = Quotient
+    // We want the Divisor or Quotient to be in the selected tables.
+    
+    // Let's construct it:
+    // a = one of selected tables (e.g. 5)
+    // b = random 1-12 (e.g. 3)
+    // product = 15
+    // Display: 15 / 5 = ? (Answer: 3) 
+    
     const product = a * b;
     return {
       a: product,

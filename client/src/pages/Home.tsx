@@ -6,10 +6,11 @@ import { Card } from "@/components/ui/card";
 import { Rocket, Zap, CheckSquare, Trophy, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { getTodayStats, getInventory, AVAILABLE_BLOCKS } from "@/lib/storage";
+import { type Operation } from "@/lib/game-logic";
 
 export default function Home() {
   const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); 
-  const [operation, setOperation] = useState<'multiply' | 'divide' | 'add' | 'subtract'>('multiply');
+  const [operations, setOperations] = useState<Operation[]>(['multiply']);
   const [todayStats, setTodayStats] = useState(getTodayStats());
   const [inventoryCount, setInventoryCount] = useState(0);
 
@@ -24,6 +25,17 @@ export default function Home() {
         ? prev.filter(n => n !== num)
         : [...prev, num].sort((a, b) => a - b)
     );
+  };
+
+  const toggleOperation = (op: Operation) => {
+    setOperations(prev => {
+        if (prev.includes(op)) {
+            // Don't allow unselecting the last one
+            if (prev.length === 1) return prev;
+            return prev.filter(o => o !== op);
+        }
+        return [...prev, op];
+    });
   };
 
   const selectAll = () => setSelectedTables([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
@@ -103,13 +115,13 @@ export default function Home() {
             <div className="p-6 space-y-8">
               {/* Operation */}
               <div className="space-y-4">
-                <label className="text-lg font-bold uppercase tracking-wider text-[#3f3f3f]">1. Choose Tool</label>
+                <label className="text-lg font-bold uppercase tracking-wider text-[#3f3f3f]">1. Choose Tools</label>
                 <div className="grid grid-cols-2 gap-4">
                   <button 
-                    onClick={() => setOperation('multiply')}
+                    onClick={() => toggleOperation('multiply')}
                     className={cn(
                       "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
-                      operation === 'multiply' 
+                      operations.includes('multiply') 
                         ? "bg-[#55ff55] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
                         : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
                     )}
@@ -118,10 +130,10 @@ export default function Home() {
                     <span className="font-bold text-lg uppercase">Multiply</span>
                   </button>
                   <button 
-                    onClick={() => setOperation('divide')}
+                    onClick={() => toggleOperation('divide')}
                     className={cn(
                       "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
-                      operation === 'divide' 
+                      operations.includes('divide') 
                         ? "bg-[#55ffff] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
                         : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
                     )}
@@ -130,10 +142,10 @@ export default function Home() {
                     <span className="font-bold text-lg uppercase">Divide</span>
                   </button>
                   <button 
-                    onClick={() => setOperation('add')}
+                    onClick={() => toggleOperation('add')}
                     className={cn(
                       "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
-                      operation === 'add' 
+                      operations.includes('add') 
                         ? "bg-[#ffaa00] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
                         : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
                     )}
@@ -142,10 +154,10 @@ export default function Home() {
                     <span className="font-bold text-lg uppercase">Add</span>
                   </button>
                   <button 
-                    onClick={() => setOperation('subtract')}
+                    onClick={() => toggleOperation('subtract')}
                     className={cn(
                       "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
-                      operation === 'subtract' 
+                      operations.includes('subtract') 
                         ? "bg-[#ff5555] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
                         : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
                     )}
@@ -200,7 +212,7 @@ export default function Home() {
                </p>
             </Card>
 
-            <Link href={`/game?mode=time-attack&op=${operation}&tables=${selectedTables.join(',')}`}>
+            <Link href={`/game?mode=time-attack&ops=${operations.join(',')}&tables=${selectedTables.join(',')}`}>
               <Button 
                 disabled={selectedTables.length === 0}
                 className={cn(

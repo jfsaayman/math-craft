@@ -133,7 +133,13 @@ export function getTodayStats() {
     else if (game.details.startsWith('Addition')) op = 'add';
     else if (game.details.startsWith('Subtraction')) op = 'subtract';
     
-    acc[op] = (acc[op] || 0) + 1;
+    // Check if the details string *contains* the operation name
+    // This supports mixed operations (e.g. "Mixed (+, -)")
+    if (game.details.includes('Multiplication') || game.details.includes('Mixed') && game.details.includes('×')) acc['multiply'] = (acc['multiply'] || 0) + 1;
+    if (game.details.includes('Division') || game.details.includes('Mixed') && game.details.includes('÷')) acc['divide'] = (acc['divide'] || 0) + 1;
+    if (game.details.includes('Addition') || game.details.includes('Mixed') && game.details.includes('+')) acc['add'] = (acc['add'] || 0) + 1;
+    if (game.details.includes('Subtraction') || game.details.includes('Mixed') && game.details.includes('-')) acc['subtract'] = (acc['subtract'] || 0) + 1;
+    
     return acc;
   }, {} as Record<string, number>);
   

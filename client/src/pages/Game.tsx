@@ -16,7 +16,11 @@ export default function Game() {
   
   const searchParams = new URLSearchParams(window.location.search);
   const mode = 'time-attack'; // Always time-attack/challenge now
-  const op = (searchParams.get("op") as Operation) || 'multiply';
+  
+  // Parse ops from URL
+  const opsParam = searchParams.get("ops");
+  const ops = (opsParam ? opsParam.split(',') : ['multiply']) as Operation[];
+
   const tablesParam = searchParams.get("tables");
   const tables = tablesParam ? tablesParam.split(',').map(Number) : [1,2,3,4,5,6,7,8,9,10,11,12];
 
@@ -55,7 +59,9 @@ export default function Game() {
   }, [gameState, timeLeft]);
 
   const nextProblem = () => {
-    setProblem(generateProblem(op, tables));
+    // Pick random operation from selected list
+    const randomOp = ops[Math.floor(Math.random() * ops.length)];
+    setProblem(generateProblem(randomOp, tables));
     setInput("");
     setFeedback('none');
   };
@@ -67,13 +73,16 @@ export default function Game() {
     
     setGameState('finished');
     
-    let opName = 'Unknown';
-    if (op === 'multiply') opName = 'Multiplication';
-    else if (op === 'divide') opName = 'Division';
-    else if (op === 'add') opName = 'Addition';
-    else if (op === 'subtract') opName = 'Subtraction';
+    // Construct readable name
+    const opNames = ops.map(o => {
+        if (o === 'multiply') return '×';
+        if (o === 'divide') return '÷';
+        if (o === 'add') return '+';
+        if (o === 'subtract') return '-';
+        return o;
+    });
 
-    const details = `${opName} (Tables: ${tables.join(',')})`;
+    const details = `Mixed (${opNames.join(', ')}) (Tables: ${tables.join(',')})`;
     saveGameToHistory(score, mode, details);
     setHighScores(getHighScores());
     
@@ -204,27 +213,7 @@ export default function Game() {
 
 
             {/* High Score Entry */}
-            {!scoreSaved && score > 0 && (
-              <div className="bg-white/50 p-4 border-2 border-black space-y-3">
-                <p className="font-display text-sm text-[#3f3f3f]">Join the Hall of Fame!</p>
-                <div className="flex gap-2">
-                  <Input 
-                    value={playerName}
-                    onChange={(e) => setPlayerName(e.target.value)}
-                    placeholder="Enter Name"
-                    className="border-2 border-black rounded-none font-body text-lg bg-white h-10"
-                    maxLength={10}
-                  />
-                  <Button 
-                    onClick={handleSaveScore}
-                    disabled={!playerName.trim()}
-                    className="bg-[#5555ff] text-white border-2 border-black rounded-none h-10 font-display text-xs"
-                  >
-                    Save
-                  </Button>
-                </div>
-              </div>
-            )}
+            {/* Removed per request */}
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row gap-4 pt-4 justify-center">

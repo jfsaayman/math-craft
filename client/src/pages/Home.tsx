@@ -3,13 +3,21 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Rocket, Zap, Play, CheckSquare, Square } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
+
+import { getTodayStats } from "@/lib/storage";
 
 export default function Home() {
   const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); // Default selection
   const [operation, setOperation] = useState<'multiply' | 'divide'>('multiply');
   const [mode, setMode] = useState<'practice' | 'time-attack'>('practice');
+  const [todayStats, setTodayStats] = useState(getTodayStats());
+
+  // Refresh stats on mount
+  useEffect(() => {
+    setTodayStats(getTodayStats());
+  }, []);
 
   const toggleTable = (num: number) => {
     setSelectedTables(prev => 
@@ -32,14 +40,34 @@ export default function Home() {
         <motion.div 
           initial={{ y: -50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="text-center mb-8 space-y-4"
+          className="text-center mb-8 space-y-4 w-full"
         >
-          <h1 className="text-4xl md:text-6xl text-[#ffffff] drop-shadow-[4px_4px_0_#000000] tracking-wider leading-tight">
-            MATH CRAFT
-          </h1>
-          <p className="text-xl text-[#e0e0e0] drop-shadow-[2px_2px_0_#000000] bg-black/50 px-4 py-1 inline-block rounded-sm">
-            Build Your Brain Power!
-          </p>
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+             <div className="flex-1"></div>
+             <div className="text-center">
+               <h1 className="text-4xl md:text-6xl text-[#ffffff] drop-shadow-[4px_4px_0_#000000] tracking-wider leading-tight">
+                 MATH CRAFT
+               </h1>
+               <p className="text-xl text-[#e0e0e0] drop-shadow-[2px_2px_0_#000000] bg-black/50 px-4 py-1 inline-block rounded-sm">
+                 Build Your Brain Power!
+               </p>
+             </div>
+             
+             {/* Daily Stats Card */}
+             <div className="flex-1 w-full md:w-auto flex justify-center md:justify-end">
+               <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px]">
+                 <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">Today's Progress</h3>
+                 <div className="flex items-center gap-2">
+                    <div className="bg-[#55ff55] w-2 h-2 border border-black"></div>
+                    <span className="font-bold text-sm">{todayStats.count} Games</span>
+                 </div>
+                 <div className="flex items-center gap-2">
+                    <div className="bg-[#5555ff] w-2 h-2 border border-black"></div>
+                    <span className="font-bold text-sm">{todayStats.totalScore} Points</span>
+                 </div>
+               </Card>
+             </div>
+          </div>
         </motion.div>
 
         <div className="w-full grid lg:grid-cols-12 gap-6">
@@ -165,7 +193,7 @@ export default function Home() {
               <Button 
                 disabled={selectedTables.length === 0}
                 className={cn(
-                  "w-full h-24 text-3xl font-display uppercase tracking-widest border-4 border-black rounded-none shadow-[8px_8px_0_#000000] active:translate-y-2 active:shadow-none transition-all",
+                  "w-full py-6 h-auto min-h-[6rem] text-xl sm:text-2xl md:text-3xl font-display uppercase tracking-widest border-4 border-black rounded-none shadow-[8px_8px_0_#000000] active:translate-y-2 active:shadow-none transition-all whitespace-normal leading-tight",
                   "bg-[#5555ff] hover:bg-[#6666ff] text-white"
                 )}
               >

@@ -9,6 +9,9 @@ import { Keypad } from "@/components/game/Keypad";
 import { generateProblem, type Operation, type Problem } from "@/lib/game-logic";
 import { cn } from "@/lib/utils";
 
+import { saveHighScore, getHighScores, saveGameToHistory, type HighScore } from "@/lib/storage";
+import { Input } from "@/components/ui/input";
+
 export default function Game() {
   const [location, setLocation] = useLocation();
   
@@ -26,6 +29,9 @@ export default function Game() {
   const [gameState, setGameState] = useState<'playing' | 'finished'>('playing');
   const [feedback, setFeedback] = useState<'none' | 'correct' | 'wrong'>('none');
   const [streak, setStreak] = useState(0);
+  const [highScores, setHighScores] = useState<HighScore[]>([]);
+  const [playerName, setPlayerName] = useState("");
+  const [scoreSaved, setScoreSaved] = useState(false);
 
   useEffect(() => {
     nextProblem();
@@ -54,6 +60,10 @@ export default function Game() {
 
   const finishGame = () => {
     setGameState('finished');
+    const details = `${op === 'multiply' ? 'Multiplication' : 'Division'} (Tables: ${tables.join(',')})`;
+    saveGameToHistory(score, mode, details);
+    setHighScores(getHighScores());
+    
     if (score > 0) {
       confetti({
         particleCount: 200,
@@ -63,6 +73,13 @@ export default function Game() {
         shapes: ['square']
       });
     }
+  };
+
+  const handleSaveScore = () => {
+    if (!playerName.trim()) return;
+    const updatedScores = saveHighScore(playerName, score, mode);
+    setHighScores(updatedScores);
+    setScoreSaved(true);
   };
 
   const handleInput = (num: number) => {
@@ -110,19 +127,61 @@ export default function Game() {
             <h2 className="text-white font-display text-lg">Mission Report</h2>
           </div>
           
-          <div className="p-8 text-center space-y-8">
+          <div className="p-8 text-center space-y-6 max-h-[80vh] overflow-y-auto custom-scrollbar">
             <motion.div 
               initial={{ scale: 0.8, opacity: 0 }}
               animate={{ scale: 1, opacity: 1 }}
               className="space-y-4"
             >
-              <Award className="w-24 h-24 text-[#ffd700] mx-auto drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
-              <h1 className="text-2xl font-display text-[#3f3f3f] uppercase">Level Complete!</h1>
-              <div className="text-6xl font-display text-[#5555ff] drop-shadow-[2px_2px_0_#000000]">{score}</div>
+              <Award className="w-16 h-16 text-[#ffd700] mx-auto drop-shadow-[4px_4px_0_rgba(0,0,0,0.5)]" />
+              <h1 className="text-xl font-display text-[#3f3f3f] uppercase">Level Complete!</h1>
+              <div className="text-5xl font-display text-[#5555ff] drop-shadow-[2px_2px_0_#000000]">{score}</div>
               <p className="text-black/60 font-body text-xl">Total Score</p>
             </motion.div>
 
-            <div className="flex flex-col gap-4">
+            {/* High Score Entry */}
+            {!scoreSaved && score > 0 && (
+              <div className="bg-white/50 p-4 border-2 border-black space-y-3">
+                <p className="font-display text-sm text-[#3f3f3f]">Join the Hall of Fame!</p>
+                <div className="flex gap-2">
+                  <Input 
+                    value={playerName}
+                    onChange={(e) => setPlayerName(e.target.value)}
+                    placeholder="Enter Name"
+                    className="border-2 border-black rounded-none font-body text-lg bg-white h-10"
+                    maxLength={10}
+                  />
+                  <Button 
+                    onClick={handleSaveScore}
+                    disabled={!playerName.trim()}
+                    className="bg-[#5555ff] text-white border-2 border-black rounded-none h-10 font-display text-xs"
+                  >
+                    Save
+                  </Button>
+                </div>
+              </div>
+            )}
+
+            {/* High Score List */}
+            <div className="bg-[#a0a0a0] border-2 border-black p-4 text-left">
+              <h3 className="font-display text-sm mb-3 text-white drop-shadow-md text-center">Top 10 Commanders</h3>
+              <div className="space-y-2">
+                {highScores.map((s, i) => (
+                  <div key={s.id} className={cn(
+                    "flex justify-between text-sm font-body border-b border-black/10 pb-1",
+                    s.name === playerName && scoreSaved && s.score === score ? "text-[#5555ff] font-bold bg-white/50 px-1" : "text-[#3f3f3f]"
+                  )}>
+                    <span>{i + 1}. {s.name}</span>
+                    <span>{s.score}</span>
+                  </div>
+                ))}
+                {highScores.length === 0 && (
+                   <div className="text-center text-black/40 text-sm italic">No records yet. Be the first!</div>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4 pt-4">
               <Button size="lg" className="h-16 text-xl font-display bg-[#55ff55] hover:bg-[#66ff66] text-black border-4 border-black rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] active:translate-y-1 active:shadow-none" onClick={() => window.location.reload()}>
                  Play Again
               </Button>
@@ -211,7 +270,7 @@ export default function Game() {
                   <div className="absolute bottom-2 left-2 w-2 h-2 bg-[#4a2615] rounded-full opacity-50" />
                   <div className="absolute bottom-2 right-2 w-2 h-2 bg-[#4a2615] rounded-full opacity-50" />
 
-                  <div className="text-5xl md:text-6xl font-display text-white tracking-widest drop-shadow-[3px_3px_0_#000000]">
+                  <div className="text-5xl md:text-6xl font-readable font-bold text-white tracking-widest drop-shadow-[3px_3px_0_#000000]">
                     {problem ? (
                       <div className="flex items-center justify-center gap-4">
                         <span>{problem.display.split('?')[0]}</span>

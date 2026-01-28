@@ -1,22 +1,21 @@
+import { useState, useEffect } from "react";
 import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Rocket, Zap, Play, CheckSquare, Square } from "lucide-react";
-import { useState, useEffect } from "react";
+import { Rocket, Zap, CheckSquare, Trophy, Grid3X3 } from "lucide-react";
 import { cn } from "@/lib/utils";
-
-import { getTodayStats } from "@/lib/storage";
+import { getTodayStats, getInventory, AVAILABLE_BLOCKS } from "@/lib/storage";
 
 export default function Home() {
-  const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); // Default selection
+  const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); 
   const [operation, setOperation] = useState<'multiply' | 'divide'>('multiply');
-  const [mode, setMode] = useState<'practice' | 'time-attack'>('practice');
   const [todayStats, setTodayStats] = useState(getTodayStats());
+  const [inventoryCount, setInventoryCount] = useState(0);
 
-  // Refresh stats on mount
   useEffect(() => {
     setTodayStats(getTodayStats());
+    setInventoryCount(getInventory().length);
   }, []);
 
   const toggleTable = (num: number) => {
@@ -32,7 +31,7 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center font-body flex flex-col items-center">
-      <div className="absolute inset-0 bg-black/40 pointer-events-none" /> {/* Overlay */}
+      <div className="absolute inset-0 bg-black/40 pointer-events-none" /> 
       
       <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col items-center min-h-screen max-w-5xl">
         
@@ -43,8 +42,20 @@ export default function Home() {
           className="text-center mb-8 space-y-4 w-full"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-             <div className="flex-1"></div>
-             <div className="text-center">
+             {/* Stats Card */}
+             <div className="flex-1 w-full md:w-auto flex justify-center md:justify-start">
+               <Link href="/collection">
+                 <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px] cursor-pointer hover:bg-[#d6d6d6] transition-colors">
+                   <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">My Collection</h3>
+                   <div className="flex items-center gap-2">
+                      <Grid3X3 className="w-4 h-4 text-blue-600" />
+                      <span className="font-bold text-sm">{inventoryCount} Blocks</span>
+                   </div>
+                 </Card>
+               </Link>
+             </div>
+
+             <div className="text-center flex-[2]">
                <h1 className="text-4xl md:text-6xl text-[#ffffff] drop-shadow-[4px_4px_0_#000000] tracking-wider leading-tight">
                  MATH CRAFT
                </h1>
@@ -78,7 +89,7 @@ export default function Home() {
               <div className="w-4 h-4 bg-red-500 border-2 border-black" />
               <div className="w-4 h-4 bg-yellow-500 border-2 border-black" />
               <div className="w-4 h-4 bg-green-500 border-2 border-black" />
-              <span className="ml-2 font-display text-white text-shadow-sm">Game Settings</span>
+              <span className="ml-2 font-display text-white text-shadow-sm">Mission Setup</span>
             </div>
             
             <div className="p-6 space-y-8">
@@ -147,53 +158,21 @@ export default function Home() {
             </div>
           </Card>
 
-          {/* Right Column: Mode & Launch */}
+          {/* Right Column: Launch */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-            <Card className="bg-[#c6c6c6] border-4 border-black p-0 overflow-hidden shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none flex-1">
-              <div className="bg-[#8b8b8b] p-3 border-b-4 border-black">
-                 <span className="font-display text-white text-shadow-sm">3. Mode</span>
-              </div>
-              
-              <div className="p-4 space-y-4">
-                 <button 
-                    onClick={() => setMode('practice')}
-                    className={cn(
-                      "w-full p-4 border-4 transition-none text-left relative active:top-1",
-                      mode === 'practice'
-                        ? "bg-[#55ff55] border-black text-black shadow-[inset_-3px_-3px_0_rgba(0,0,0,0.2)]"
-                        : "bg-[#7c7c7c] border-black text-white shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
-                    )}
-                  >
-                    <h3 className="font-bold text-lg uppercase flex items-center gap-2">
-                      <CheckSquare className={cn("w-5 h-5", mode === 'practice' ? "opacity-100" : "opacity-0")} />
-                      Training
-                    </h3>
-                    <p className="text-sm opacity-70 mt-1 pl-7">No timer. Just practice.</p>
-                 </button>
-
-                 <button 
-                    onClick={() => setMode('time-attack')}
-                    className={cn(
-                      "w-full p-4 border-4 transition-none text-left relative active:top-1",
-                      mode === 'time-attack'
-                        ? "bg-[#ffaa00] border-black text-black shadow-[inset_-3px_-3px_0_rgba(0,0,0,0.2)]"
-                        : "bg-[#7c7c7c] border-black text-white shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
-                    )}
-                  >
-                    <h3 className="font-bold text-lg uppercase flex items-center gap-2">
-                      <CheckSquare className={cn("w-5 h-5", mode === 'time-attack' ? "opacity-100" : "opacity-0")} />
-                      Time Attack
-                    </h3>
-                    <p className="text-sm opacity-70 mt-1 pl-7">60 seconds to survive!</p>
-                 </button>
-              </div>
+            <Card className="bg-[#c6c6c6] border-4 border-black p-0 overflow-hidden shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none flex-1 flex flex-col justify-center items-center text-center p-6">
+               <Trophy className="w-16 h-16 text-yellow-500 mb-4 drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
+               <h3 className="font-display text-xl text-[#3f3f3f] mb-2">Earn Blocks!</h3>
+               <p className="font-body text-lg text-[#3f3f3f]/80">
+                 Complete missions to unlock new blocks for your collection.
+               </p>
             </Card>
 
-            <Link href={`/game?mode=${mode}&op=${operation}&tables=${selectedTables.join(',')}`}>
+            <Link href={`/game?mode=time-attack&op=${operation}&tables=${selectedTables.join(',')}`}>
               <Button 
                 disabled={selectedTables.length === 0}
                 className={cn(
-                  "w-full py-6 h-auto min-h-[6rem] text-xl sm:text-2xl md:text-3xl font-display uppercase tracking-widest border-4 border-black rounded-none shadow-[8px_8px_0_#000000] active:translate-y-2 active:shadow-none transition-all whitespace-normal leading-tight",
+                  "w-full py-8 h-auto text-3xl font-display uppercase tracking-widest border-4 border-black rounded-none shadow-[8px_8px_0_#000000] active:translate-y-2 active:shadow-none transition-all whitespace-normal leading-tight",
                   "bg-[#5555ff] hover:bg-[#6666ff] text-white"
                 )}
               >

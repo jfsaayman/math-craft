@@ -14,8 +14,49 @@ export interface GameRecord {
   details: string; // e.g., "Multiplication (Tables: 2,5,10)"
 }
 
+export interface CollectedBlock {
+  id: string;
+  type: string; // 'grass', 'diamond', 'gold', 'tnt'
+  name: string;
+  date: string;
+}
+
 const HIGH_SCORES_KEY = 'math-craft-high-scores';
 const HISTORY_KEY = 'math-craft-history';
+const INVENTORY_KEY = 'math-craft-inventory';
+
+export const AVAILABLE_BLOCKS = [
+  { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass_block.png', rarity: 'common' },
+  { type: 'diamond', name: 'Diamond Ore', src: '/assets/blocks/diamond_ore.png', rarity: 'legendary' },
+  { type: 'gold', name: 'Gold Ore', src: '/assets/blocks/gold_ore.png', rarity: 'rare' },
+  { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' }
+];
+
+export function getInventory(): CollectedBlock[] {
+  try {
+    const data = localStorage.getItem(INVENTORY_KEY);
+    return data ? JSON.parse(data) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+export function addToInventory(blockType: string) {
+  const inventory = getInventory();
+  const blockDef = AVAILABLE_BLOCKS.find(b => b.type === blockType);
+  if (!blockDef) return inventory;
+
+  const newBlock: CollectedBlock = {
+    id: crypto.randomUUID(),
+    type: blockType,
+    name: blockDef.name,
+    date: new Date().toISOString()
+  };
+
+  inventory.push(newBlock);
+  localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
+  return inventory;
+}
 
 export function getHighScores(): HighScore[] {
   try {

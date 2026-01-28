@@ -1,4 +1,4 @@
-export type Operation = 'multiply' | 'divide';
+export type Operation = 'multiply' | 'divide' | 'add' | 'subtract';
 
 export interface Problem {
   a: number;
@@ -18,11 +18,20 @@ export const generateProblem = (operation: Operation, selectedTables: number[]):
   // Pick the second number randomly from 1 to 12
   const b = Math.floor(Math.random() * 12) + 1;
 
-  // Randomize order for multiplication so it's not always "Table x Random"
+  // RULE: For tables under 11, do not multiply by or divide by 11 or 12.
+  // This means if 'a' is < 11, 'b' MUST be <= 10.
+  // If 'a' >= 11, 'b' can be up to 12.
+  let validB = b;
+  if (a < 11) {
+    // Force b to be max 10
+    validB = Math.floor(Math.random() * 10) + 1;
+  }
+
+  // Randomize order for multiplication/addition so it's not always "Table x Random"
   // e.g. 5x3 or 3x5
   const swap = Math.random() > 0.5;
-  const first = swap ? b : a;
-  const second = swap ? a : b;
+  const first = swap ? validB : a;
+  const second = swap ? a : validB;
 
   if (operation === 'multiply') {
     return {
@@ -32,30 +41,44 @@ export const generateProblem = (operation: Operation, selectedTables: number[]):
       operation,
       display: `${first} × ${second} = ?`
     };
-  } else {
+  } else if (operation === 'divide') {
     // Division
     // Ensure integer result.
-    // Problem: (a * b) / a = b
-    // The "dividend" should be a multiple of one of the selected tables.
+    // Problem: (a * validB) / a = validB
+    // a is the table we are practicing.
     
-    // For division, "practicing the 5 times table" usually means dividing BY 5, 
-    // or dividing a multiple OF 5.
-    // Let's standardize: Dividend / Divisor = Quotient
-    // We want the Divisor or Quotient to be in the selected tables.
+    // We want the divisor (a) or the quotient (validB) to be from the selected tables.
+    // But typically "Divide by 5" means 5 is the divisor.
     
-    // Let's construct it:
-    // a = one of selected tables (e.g. 5)
-    // b = random 1-12 (e.g. 3)
-    // product = 15
-    // Display: 15 / 5 = ? (Answer: 3) 
-    
-    const product = a * b;
+    // The previous logic was: product / a = validB
+    // product = a * validB
+    const product = a * validB;
     return {
       a: product,
       b: a,
-      answer: b,
+      answer: validB,
       operation,
       display: `${product} ÷ ${a} = ?`
+    };
+  } else if (operation === 'add') {
+    return {
+        a: first,
+        b: second,
+        answer: first + second,
+        operation,
+        display: `${first} + ${second} = ?`
+    };
+  } else {
+    // Subtract
+    // Ensure positive result.
+    // Problem: (a + validB) - a = validB
+    const sum = a + validB;
+    return {
+        a: sum,
+        b: a,
+        answer: validB,
+        operation,
+        display: `${sum} - ${a} = ?`
     };
   }
 };

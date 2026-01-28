@@ -123,10 +123,24 @@ export function getTodayStats() {
   const today = new Date().toDateString();
   
   const todayGames = history.filter(game => new Date(game.date).toDateString() === today);
+
+  // Parse details to find operation types
+  // details string format: "Multiplication (Tables: ...)"
+  const statsByOp = todayGames.reduce((acc, game) => {
+    let op = 'Unknown';
+    if (game.details.startsWith('Multiplication')) op = 'multiply';
+    else if (game.details.startsWith('Division')) op = 'divide';
+    else if (game.details.startsWith('Addition')) op = 'add';
+    else if (game.details.startsWith('Subtraction')) op = 'subtract';
+    
+    acc[op] = (acc[op] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
   
   return {
     count: todayGames.length,
     totalScore: todayGames.reduce((acc, curr) => acc + curr.score, 0),
-    games: todayGames
+    games: todayGames,
+    breakdown: statsByOp
   };
 }

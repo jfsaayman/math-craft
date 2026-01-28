@@ -66,7 +66,14 @@ export default function Game() {
     setRewardOptions(shuffled.slice(0, 3));
     
     setGameState('finished');
-    const details = `${op === 'multiply' ? 'Multiplication' : 'Division'} (Tables: ${tables.join(',')})`;
+    
+    let opName = 'Unknown';
+    if (op === 'multiply') opName = 'Multiplication';
+    else if (op === 'divide') opName = 'Division';
+    else if (op === 'add') opName = 'Addition';
+    else if (op === 'subtract') opName = 'Subtraction';
+
+    const details = `${opName} (Tables: ${tables.join(',')})`;
     saveGameToHistory(score, mode, details);
     setHighScores(getHighScores());
     

@@ -9,7 +9,7 @@ import { getTodayStats, getInventory, AVAILABLE_BLOCKS } from "@/lib/storage";
 
 export default function Home() {
   const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); 
-  const [operation, setOperation] = useState<'multiply' | 'divide'>('multiply');
+  const [operation, setOperation] = useState<'multiply' | 'divide' | 'add' | 'subtract'>('multiply');
   const [todayStats, setTodayStats] = useState(getTodayStats());
   const [inventoryCount, setInventoryCount] = useState(0);
 
@@ -68,13 +68,21 @@ export default function Home() {
              <div className="flex-1 w-full md:w-auto flex justify-center md:justify-end">
                <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px]">
                  <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">Today's Progress</h3>
-                 <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2 mb-1">
                     <div className="bg-[#55ff55] w-2 h-2 border border-black"></div>
                     <span className="font-bold text-sm">{todayStats.count} Games</span>
                  </div>
-                 <div className="flex items-center gap-2">
+                 <div className="flex items-center gap-2 mb-2">
                     <div className="bg-[#5555ff] w-2 h-2 border border-black"></div>
                     <span className="font-bold text-sm">{todayStats.totalScore} Points</span>
+                 </div>
+                 
+                 {/* Breakdown */}
+                 <div className="border-t border-black/20 pt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[#3f3f3f]">
+                    <div>×: {todayStats.breakdown?.multiply || 0}</div>
+                    <div>÷: {todayStats.breakdown?.divide || 0}</div>
+                    <div>+: {todayStats.breakdown?.add || 0}</div>
+                    <div>-: {todayStats.breakdown?.subtract || 0}</div>
                  </div>
                </Card>
              </div>
@@ -96,30 +104,54 @@ export default function Home() {
               {/* Operation */}
               <div className="space-y-4">
                 <label className="text-lg font-bold uppercase tracking-wider text-[#3f3f3f]">1. Choose Tool</label>
-                <div className="flex gap-4">
+                <div className="grid grid-cols-2 gap-4">
                   <button 
                     onClick={() => setOperation('multiply')}
                     className={cn(
-                      "flex-1 p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
+                      "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
                       operation === 'multiply' 
                         ? "bg-[#55ff55] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
                         : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
                     )}
                   >
-                    <span className="text-4xl font-display">×</span>
-                    <span className="font-bold text-xl uppercase">Multiply</span>
+                    <span className="text-3xl font-display">×</span>
+                    <span className="font-bold text-lg uppercase">Multiply</span>
                   </button>
                   <button 
                     onClick={() => setOperation('divide')}
                     className={cn(
-                      "flex-1 p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
+                      "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
                       operation === 'divide' 
                         ? "bg-[#55ffff] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
                         : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
                     )}
                   >
-                    <span className="text-4xl font-display">÷</span>
-                    <span className="font-bold text-xl uppercase">Divide</span>
+                    <span className="text-3xl font-display">÷</span>
+                    <span className="font-bold text-lg uppercase">Divide</span>
+                  </button>
+                  <button 
+                    onClick={() => setOperation('add')}
+                    className={cn(
+                      "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
+                      operation === 'add' 
+                        ? "bg-[#ffaa00] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
+                        : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
+                    )}
+                  >
+                    <span className="text-3xl font-display">+</span>
+                    <span className="font-bold text-lg uppercase">Add</span>
+                  </button>
+                  <button 
+                    onClick={() => setOperation('subtract')}
+                    className={cn(
+                      "p-4 border-4 transition-none flex items-center justify-center gap-3 active:translate-y-1 relative",
+                      operation === 'subtract' 
+                        ? "bg-[#ff5555] border-black text-black shadow-[inset_-4px_-4px_0_rgba(0,0,0,0.2)]" 
+                        : "bg-[#7c7c7c] border-black text-white hover:bg-[#8c8c8c] shadow-[4px_4px_0_rgba(0,0,0,0.5)]"
+                    )}
+                  >
+                    <span className="text-3xl font-display">-</span>
+                    <span className="font-bold text-lg uppercase">Subtract</span>
                   </button>
                 </div>
               </div>

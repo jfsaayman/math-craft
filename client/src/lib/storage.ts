@@ -29,7 +29,14 @@ export const AVAILABLE_BLOCKS = [
   { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass.png', rarity: 'common' },
   { type: 'diamond', name: 'Diamond Ore', src: '/assets/blocks/diamond_ore.png', rarity: 'legendary' },
   { type: 'gold', name: 'Gold Ore', src: '/assets/blocks/gold_ore.png', rarity: 'rare' },
-  { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' }
+  { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' },
+  { type: 'obsidian', name: 'Obsidian', src: '/assets/blocks/obsidian.png', rarity: 'epic' },
+  { type: 'crafting_table', name: 'Crafting Table', src: '/assets/blocks/crafting_table.png', rarity: 'common' },
+  { type: 'water', name: 'Water', src: '/assets/blocks/water.png', rarity: 'common' },
+  { type: 'powder_snow', name: 'Powder Snow', src: '/assets/blocks/powder_snow.png', rarity: 'rare' },
+  { type: 'sticky_piston', name: 'Sticky Piston', src: '/assets/blocks/sticky_piston.png', rarity: 'rare' },
+  { type: 'redstone_lamp', name: 'Redstone Lamp', src: '/assets/blocks/redstone_lamp.png', rarity: 'rare' },
+  { type: 'dried_kelp', name: 'Dried Kelp Block', src: '/assets/blocks/dried_kelp_block.png', rarity: 'common' }
 ];
 
 export function getInventory(): CollectedBlock[] {

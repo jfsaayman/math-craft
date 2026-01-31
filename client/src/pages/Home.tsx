@@ -3,19 +3,21 @@ import { Link } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Rocket, Zap, CheckSquare, Trophy, Grid3X3 } from "lucide-react";
+import { Rocket, Zap, CheckSquare, Trophy, Grid3X3, BarChart3 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getTodayStats, getInventory, AVAILABLE_BLOCKS } from "@/lib/storage";
+import { getTodayStats, getOverallStats, getInventory, AVAILABLE_BLOCKS } from "@/lib/storage";
 import { type Operation } from "@/lib/game-logic";
 
 export default function Home() {
   const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); 
   const [operations, setOperations] = useState<Operation[]>(['multiply']);
   const [todayStats, setTodayStats] = useState(getTodayStats());
+  const [overallStats, setOverallStats] = useState(getOverallStats());
   const [inventoryCount, setInventoryCount] = useState(0);
 
   useEffect(() => {
     setTodayStats(getTodayStats());
+    setOverallStats(getOverallStats());
     setInventoryCount(getInventory().length);
   }, []);
 
@@ -54,8 +56,9 @@ export default function Home() {
           className="text-center mb-8 space-y-4 w-full"
         >
           <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-             {/* Stats Card */}
-             <div className="flex-1 w-full md:w-auto flex justify-center md:justify-start">
+             {/* Stats Container */}
+             <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-4 items-center md:items-start">
+               {/* Collection Card */}
                <Link href="/collection">
                  <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px] cursor-pointer hover:bg-[#d6d6d6] transition-colors">
                    <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">My Collection</h3>
@@ -65,6 +68,21 @@ export default function Home() {
                    </div>
                  </Card>
                </Link>
+
+               {/* Overall Progress Card */}
+               <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px]">
+                 <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">Overall Stats</h3>
+                 <div className="flex items-center gap-2 mb-1">
+                    <BarChart3 className="w-4 h-4 text-[#5555ff]" />
+                    <span className="font-bold text-sm">{overallStats.count} Games</span>
+                 </div>
+                 <div className="border-t border-black/20 pt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[#3f3f3f]">
+                    <div>×: {overallStats.breakdown?.multiply || 0}</div>
+                    <div>÷: {overallStats.breakdown?.divide || 0}</div>
+                    <div>+: {overallStats.breakdown?.add || 0}</div>
+                    <div>-: {overallStats.breakdown?.subtract || 0}</div>
+                 </div>
+               </Card>
              </div>
 
              <div className="text-center flex-[2]">

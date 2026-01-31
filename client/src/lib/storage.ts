@@ -124,17 +124,27 @@ export function getTodayStats() {
   
   const todayGames = history.filter(game => new Date(game.date).toDateString() === today);
 
-  // Parse details to find operation types
-  // details string format: "Multiplication (Tables: ...)"
-  const statsByOp = todayGames.reduce((acc, game) => {
-    let op = 'Unknown';
-    if (game.details.startsWith('Multiplication')) op = 'multiply';
-    else if (game.details.startsWith('Division')) op = 'divide';
-    else if (game.details.startsWith('Addition')) op = 'add';
-    else if (game.details.startsWith('Subtraction')) op = 'subtract';
-    
-    // Check if the details string *contains* the operation name
-    // This supports mixed operations (e.g. "Mixed (+, -)")
+  return {
+    count: todayGames.length,
+    totalScore: todayGames.reduce((acc, curr) => acc + curr.score, 0),
+    games: todayGames,
+    breakdown: calculateBreakdown(todayGames)
+  };
+}
+
+export function getOverallStats() {
+  const history = getHistory();
+  
+  return {
+    count: history.length,
+    totalScore: history.reduce((acc, curr) => acc + curr.score, 0),
+    games: history,
+    breakdown: calculateBreakdown(history)
+  };
+}
+
+function calculateBreakdown(games: GameRecord[]) {
+  return games.reduce((acc, game) => {
     if (game.details.includes('Multiplication') || game.details.includes('Mixed') && game.details.includes('×')) acc['multiply'] = (acc['multiply'] || 0) + 1;
     if (game.details.includes('Division') || game.details.includes('Mixed') && game.details.includes('÷')) acc['divide'] = (acc['divide'] || 0) + 1;
     if (game.details.includes('Addition') || game.details.includes('Mixed') && game.details.includes('+')) acc['add'] = (acc['add'] || 0) + 1;
@@ -142,11 +152,4 @@ export function getTodayStats() {
     
     return acc;
   }, {} as Record<string, number>);
-  
-  return {
-    count: todayGames.length,
-    totalScore: todayGames.reduce((acc, curr) => acc + curr.score, 0),
-    games: todayGames,
-    breakdown: statsByOp
-  };
 }

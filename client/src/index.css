@@ -92,6 +92,11 @@
     image-rendering: pixelated;
   }
   
+  .remove-bg {
+    mix-blend-mode: multiply;
+    filter: brightness(1.1) contrast(1.1);
+  }
+  
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
     line-height: 1.5;

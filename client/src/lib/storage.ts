@@ -26,7 +26,7 @@ const HISTORY_KEY = 'math-craft-history';
 const INVENTORY_KEY = 'math-craft-inventory';
 
 export const AVAILABLE_BLOCKS = [
-  { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass_block.png', rarity: 'common' },
+  { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass.png', rarity: 'common' },
   { type: 'diamond', name: 'Diamond Ore', src: '/assets/blocks/diamond_ore.png', rarity: 'legendary' },
   { type: 'gold', name: 'Gold Ore', src: '/assets/blocks/gold_ore.png', rarity: 'rare' },
   { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' }

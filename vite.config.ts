@@ -6,6 +6,7 @@ import path from "path";
 import { metaImagesPlugin } from "./vite-plugin-meta-images";
 
 export default defineConfig({
+  base: "/math-craft/",
   plugins: [
     react(),
     tailwindcss(),
@@ -21,20 +22,20 @@ export default defineConfig({
         background_color: "#1a1a2e",
         display: "standalone",
         orientation: "portrait",
-        start_url: "/",
+        start_url: "./",
         icons: [
           {
-            src: "/favicon.png",
+            src: "favicon.png",
             sizes: "192x192",
             type: "image/png",
           },
           {
-            src: "/favicon.png",
+            src: "favicon.png",
             sizes: "512x512",
             type: "image/png",
           },
           {
-            src: "/favicon.png",
+            src: "favicon.png",
             sizes: "512x512",
             type: "image/png",
             purpose: "maskable",

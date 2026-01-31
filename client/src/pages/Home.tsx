@@ -70,17 +70,29 @@ export default function Home() {
                </Link>
 
                {/* Overall Progress Card */}
-               <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px]">
-                 <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">Overall Stats</h3>
-                 <div className="flex items-center gap-2 mb-1">
-                    <BarChart3 className="w-4 h-4 text-[#5555ff]" />
-                    <span className="font-bold text-sm">{overallStats.count} Games</span>
+               <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[240px]">
+                 <h3 className="font-display text-sm text-[#3f3f3f] uppercase mb-2 border-b-2 border-black/10 pb-1">Overall Stats</h3>
+                 <div className="flex items-center gap-3 mb-3 bg-white/30 p-2 border-2 border-black/10">
+                    <BarChart3 className="w-5 h-5 text-[#5555ff]" />
+                    <span className="font-display text-lg text-blue-700">{overallStats.count} Games</span>
                  </div>
-                 <div className="border-t border-black/20 pt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[#3f3f3f]">
-                    <div>×: {overallStats.breakdown?.multiply || 0}</div>
-                    <div>÷: {overallStats.breakdown?.divide || 0}</div>
-                    <div>+: {overallStats.breakdown?.add || 0}</div>
-                    <div>-: {overallStats.breakdown?.subtract || 0}</div>
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm font-bold text-[#3f3f3f]">
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">×</span>
+                      <span>{overallStats.breakdown?.multiply || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">÷</span>
+                      <span>{overallStats.breakdown?.divide || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">+</span>
+                      <span>{overallStats.breakdown?.add || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">-</span>
+                      <span>{overallStats.breakdown?.subtract || 0}</span>
+                    </div>
                  </div>
                </Card>
              </div>
@@ -96,23 +108,43 @@ export default function Home() {
              
              {/* Daily Stats Card */}
              <div className="flex-1 w-full md:w-auto flex justify-center md:justify-end">
-               <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px]">
-                 <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">Today's Progress</h3>
-                 <div className="flex items-center gap-2 mb-1">
-                    <div className="bg-[#55ff55] w-2 h-2 border border-black"></div>
-                    <span className="font-bold text-sm">{todayStats.count} Games</span>
-                 </div>
-                 <div className="flex items-center gap-2 mb-2">
-                    <div className="bg-[#5555ff] w-2 h-2 border border-black"></div>
-                    <span className="font-bold text-sm">{todayStats.totalScore} Points</span>
+               <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[240px]">
+                 <h3 className="font-display text-sm text-[#3f3f3f] uppercase mb-2 border-b-2 border-black/10 pb-1">Today's Progress</h3>
+                 <div className="space-y-2 mb-3">
+                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
+                      <div className="flex items-center gap-2">
+                        <div className="bg-[#55ff55] w-3 h-3 border border-black"></div>
+                        <span className="font-display text-sm">GAMES</span>
+                      </div>
+                      <span className="font-display text-lg text-green-700">{todayStats.count}</span>
+                   </div>
+                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
+                      <div className="flex items-center gap-2">
+                        <div className="bg-[#5555ff] w-3 h-3 border border-black"></div>
+                        <span className="font-display text-sm">POINTS</span>
+                      </div>
+                      <span className="font-display text-lg text-blue-700">{todayStats.totalScore}</span>
+                   </div>
                  </div>
                  
                  {/* Breakdown */}
-                 <div className="border-t border-black/20 pt-1 grid grid-cols-2 gap-x-2 gap-y-1 text-xs text-[#3f3f3f]">
-                    <div>×: {todayStats.breakdown?.multiply || 0}</div>
-                    <div>÷: {todayStats.breakdown?.divide || 0}</div>
-                    <div>+: {todayStats.breakdown?.add || 0}</div>
-                    <div>-: {todayStats.breakdown?.subtract || 0}</div>
+                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm font-bold text-[#3f3f3f]">
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">×</span>
+                      <span>{todayStats.breakdown?.multiply || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">÷</span>
+                      <span>{todayStats.breakdown?.divide || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">+</span>
+                      <span>{todayStats.breakdown?.add || 0}</span>
+                    </div>
+                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                      <span className="text-lg">-</span>
+                      <span>{todayStats.breakdown?.subtract || 0}</span>
+                    </div>
                  </div>
                </Card>
              </div>

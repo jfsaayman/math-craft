@@ -55,63 +55,8 @@ export default function Home() {
           animate={{ y: 0, opacity: 1 }}
           className="text-center mb-8 space-y-4 w-full"
         >
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-             {/* Stats Container */}
-             <div className="flex-1 w-full md:w-auto flex flex-col sm:flex-row md:flex-col gap-4 items-center md:items-start">
-               {/* Collection Card */}
-               <Link href="/collection">
-                 <Card className="bg-[#c6c6c6] border-4 border-black p-3 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[200px] cursor-pointer hover:bg-[#d6d6d6] transition-colors">
-                   <h3 className="font-display text-xs text-[#3f3f3f] uppercase mb-1">My Collection</h3>
-                   <div className="flex items-center gap-2">
-                      <Grid3X3 className="w-4 h-4 text-blue-600" />
-                      <span className="font-bold text-sm">{inventoryCount} Blocks</span>
-                   </div>
-                 </Card>
-               </Link>
-
-               {/* Overall Progress Card */}
-               <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[240px]">
-                 <h3 className="font-display text-sm text-[#3f3f3f] uppercase mb-2 border-b-2 border-black/10 pb-1">Overall Stats</h3>
-                 <div className="space-y-2 mb-3">
-                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
-                      <div className="flex items-center gap-2">
-                        <BarChart3 className="w-4 h-4 text-[#5555ff]" />
-                        <span className="font-display text-[10px]">GAMES</span>
-                      </div>
-                      <span className="font-display text-lg text-blue-700">{overallStats.count}</span>
-                   </div>
-                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
-                      <div className="flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-orange-500 fill-orange-500" />
-                        <span className="font-display text-[10px]">TOTAL XP</span>
-                      </div>
-                      <span className="font-display text-sm text-orange-700 truncate ml-2">
-                        {overallStats.totalScore.toLocaleString()}
-                      </span>
-                   </div>
-                 </div>
-                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm font-bold text-[#3f3f3f]">
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">×</span>
-                      <span>{overallStats.breakdown?.multiply || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">÷</span>
-                      <span>{overallStats.breakdown?.divide || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">+</span>
-                      <span>{overallStats.breakdown?.add || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">-</span>
-                      <span>{overallStats.breakdown?.subtract || 0}</span>
-                    </div>
-                 </div>
-               </Card>
-             </div>
-
-             <div className="text-center flex-[2]">
+          <div className="flex flex-col md:flex-row items-center justify-center gap-4">
+             <div className="text-center">
                <h1 className="text-4xl md:text-6xl text-[#ffffff] drop-shadow-[4px_4px_0_#000000] tracking-wider leading-tight">
                  MATH CRAFT
                </h1>
@@ -119,50 +64,62 @@ export default function Home() {
                  Build Your Brain Power!
                </p>
              </div>
-             
-             {/* Daily Stats Card */}
-             <div className="flex-1 w-full md:w-auto flex justify-center md:justify-end">
-               <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[240px]">
-                 <h3 className="font-display text-sm text-[#3f3f3f] uppercase mb-2 border-b-2 border-black/10 pb-1">Today's Progress</h3>
-                 <div className="space-y-2 mb-3">
-                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-[#55ff55] w-3 h-3 border border-black"></div>
-                        <span className="font-display text-sm">GAMES</span>
-                      </div>
-                      <span className="font-display text-lg text-green-700">{todayStats.count}</span>
-                   </div>
-                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
-                      <div className="flex items-center gap-2">
-                        <div className="bg-[#5555ff] w-3 h-3 border border-black"></div>
-                        <span className="font-display text-sm">POINTS</span>
-                      </div>
-                      <span className="font-display text-lg text-blue-700">{todayStats.totalScore}</span>
-                   </div>
-                 </div>
-                 
-                 {/* Breakdown */}
-                 <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm font-bold text-[#3f3f3f]">
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">×</span>
-                      <span>{todayStats.breakdown?.multiply || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">÷</span>
-                      <span>{todayStats.breakdown?.divide || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">+</span>
-                      <span>{todayStats.breakdown?.add || 0}</span>
-                    </div>
-                    <div className="flex justify-between items-center bg-black/5 px-2 py-1">
-                      <span className="text-lg">-</span>
-                      <span>{todayStats.breakdown?.subtract || 0}</span>
-                    </div>
-                 </div>
-               </Card>
-             </div>
           </div>
+        </motion.div>
+
+        {/* Overall Progress Section (New Horizontal Layout) */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.1 }}
+          className="w-full mb-8"
+        >
+          <Card className="bg-[#c6c6c6] border-4 border-black p-0 shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none overflow-hidden">
+            <div className="bg-[#8b8b8b] p-3 border-b-4 border-black flex items-center gap-2">
+              <BarChart3 className="w-5 h-5 text-white" />
+              <span className="font-display text-white text-shadow-sm uppercase">Hall of Fame Stats</span>
+            </div>
+            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Total Games */}
+              <div className="flex flex-col items-center justify-center p-4 bg-white/20 border-4 border-black/10">
+                <span className="font-display text-xs text-[#3f3f3f] mb-2 uppercase">Total Missions</span>
+                <span className="font-display text-4xl text-blue-700 drop-shadow-[2px_2px_0_rgba(255,255,255,0.5)]">
+                  {overallStats.count}
+                </span>
+              </div>
+
+              {/* Total XP */}
+              <div className="flex flex-col items-center justify-center p-4 bg-white/20 border-4 border-black/10">
+                <span className="font-display text-xs text-[#3f3f3f] mb-2 uppercase">Total XP</span>
+                <div className="flex items-center gap-3">
+                  <Zap className="w-6 h-6 text-orange-500 fill-orange-500" />
+                  <span className="font-display text-4xl text-orange-700 drop-shadow-[2px_2px_0_rgba(255,255,255,0.5)]">
+                    {overallStats.totalScore.toLocaleString()}
+                  </span>
+                </div>
+              </div>
+
+              {/* Skills Breakdown */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
+                  <span className="font-display text-xl">×</span>
+                  <span className="font-display text-lg">{overallStats.breakdown?.multiply || 0}</span>
+                </div>
+                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
+                  <span className="font-display text-xl">÷</span>
+                  <span className="font-display text-lg">{overallStats.breakdown?.divide || 0}</span>
+                </div>
+                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
+                  <span className="font-display text-xl">+</span>
+                  <span className="font-display text-lg">{overallStats.breakdown?.add || 0}</span>
+                </div>
+                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
+                  <span className="font-display text-xl">-</span>
+                  <span className="font-display text-lg">{overallStats.breakdown?.subtract || 0}</span>
+                </div>
+              </div>
+            </div>
+          </Card>
         </motion.div>
 
         <div className="w-full grid lg:grid-cols-12 gap-6">
@@ -266,15 +223,57 @@ export default function Home() {
             </div>
           </Card>
 
-          {/* Right Column: Launch */}
+          {/* Right Column: Stats & Launch */}
           <div className="lg:col-span-4 flex flex-col gap-6">
-            <Card className="bg-[#c6c6c6] border-4 border-black p-0 overflow-hidden shadow-[8px_8px_0_rgba(0,0,0,0.5)] rounded-none flex-1 flex flex-col justify-center items-center text-center p-6">
-               <Trophy className="w-16 h-16 text-yellow-500 mb-4 drop-shadow-[2px_2px_0_rgba(0,0,0,0.5)]" />
-               <h3 className="font-display text-xl text-[#3f3f3f] mb-2">Earn Blocks!</h3>
-               <p className="font-body text-lg text-[#3f3f3f]/80">
-                 Complete missions to unlock new blocks for your collection.
-               </p>
+            {/* Daily Stats Card */}
+            <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[8px_8px_0_rgba(0,0,0,0.5)]">
+               <h3 className="font-display text-sm text-[#3f3f3f] uppercase mb-3 border-b-2 border-black/10 pb-1">Today's Progress</h3>
+               <div className="space-y-2 mb-4">
+                 <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-[#55ff55] w-3 h-3 border border-black"></div>
+                      <span className="font-display text-xs">GAMES</span>
+                    </div>
+                    <span className="font-display text-lg text-green-700">{todayStats.count}</span>
+                 </div>
+                 <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
+                    <div className="flex items-center gap-2">
+                      <div className="bg-[#5555ff] w-3 h-3 border border-black"></div>
+                      <span className="font-display text-xs">POINTS</span>
+                    </div>
+                    <span className="font-display text-lg text-blue-700">{todayStats.totalScore}</span>
+                 </div>
+               </div>
+               
+               <div className="grid grid-cols-2 gap-2 text-sm font-bold text-[#3f3f3f]">
+                  <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                    <span>×</span>
+                    <span>{todayStats.breakdown?.multiply || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                    <span>÷</span>
+                    <span>{todayStats.breakdown?.divide || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                    <span>+</span>
+                    <span>{todayStats.breakdown?.add || 0}</span>
+                  </div>
+                  <div className="flex justify-between items-center bg-black/5 px-2 py-1">
+                    <span>-</span>
+                    <span>{todayStats.breakdown?.subtract || 0}</span>
+                  </div>
+               </div>
             </Card>
+
+            <Link href="/collection" className="block">
+              <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[8px_8px_0_rgba(0,0,0,0.5)] cursor-pointer hover:bg-[#d6d6d6] transition-colors flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                  <Grid3X3 className="w-6 h-6 text-blue-600" />
+                  <span className="font-display text-sm text-[#3f3f3f] uppercase">My Blocks</span>
+                </div>
+                <span className="font-display text-xl">{inventoryCount}</span>
+              </Card>
+            </Link>
 
             <Link href={`/game?mode=time-attack&ops=${operations.join(',')}&tables=${selectedTables.join(',')}`}>
               <Button 

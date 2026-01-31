@@ -1,3 +1,7 @@
+// Helper to get asset URL with base path for GitHub Pages
+const BASE_URL = import.meta.env.BASE_URL || '/';
+export const assetUrl = (path: string) => `${BASE_URL}${path.startsWith('/') ? path.slice(1) : path}`;
+
 export interface HighScore {
   id: string;
   name: string;
@@ -30,8 +34,8 @@ export interface User {
 }
 
 export const USERS: User[] = [
-  { id: 'jake', name: 'Jake', avatar: '/assets/avatars/jake.png', gender: 'boy' },
-  { id: 'jeanie', name: 'Jeanie', avatar: '/assets/avatars/jeanie.png', gender: 'girl' }
+  { id: 'jake', name: 'Jake', avatar: assetUrl('assets/avatars/jake.png'), gender: 'boy' },
+  { id: 'jeanie', name: 'Jeanie', avatar: assetUrl('assets/avatars/jeanie.png'), gender: 'girl' }
 ];
 
 const CURRENT_USER_KEY = 'math-craft-current-user';
@@ -40,17 +44,17 @@ const HISTORY_KEY = 'math-craft-history';
 const INVENTORY_KEY = 'math-craft-inventory';
 
 export const AVAILABLE_BLOCKS = [
-  { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass.png', rarity: 'common' },
-  { type: 'diamond', name: 'Diamond Ore', src: '/assets/blocks/diamond_ore.png', rarity: 'legendary' },
-  { type: 'gold', name: 'Gold Ore', src: '/assets/blocks/gold_ore.png', rarity: 'rare' },
-  { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' },
-  { type: 'obsidian', name: 'Obsidian', src: '/assets/blocks/obsidian.png', rarity: 'epic' },
-  { type: 'crafting_table', name: 'Crafting Table', src: '/assets/blocks/crafting_table.png', rarity: 'common' },
-  { type: 'water', name: 'Water', src: '/assets/blocks/water.png', rarity: 'common' },
-  { type: 'powder_snow', name: 'Powder Snow', src: '/assets/blocks/powder_snow.png', rarity: 'rare' },
-  { type: 'sticky_piston', name: 'Sticky Piston', src: '/assets/blocks/sticky_piston.png', rarity: 'rare' },
-  { type: 'redstone_lamp', name: 'Redstone Lamp', src: '/assets/blocks/redstone_lamp.png', rarity: 'rare' },
-  { type: 'dried_kelp', name: 'Dried Kelp Block', src: '/assets/blocks/dried_kelp_block.png', rarity: 'common' }
+  { type: 'grass', name: 'Grass Block', src: assetUrl('assets/blocks/grass.png'), rarity: 'common' },
+  { type: 'diamond', name: 'Diamond Ore', src: assetUrl('assets/blocks/diamond_ore.png'), rarity: 'legendary' },
+  { type: 'gold', name: 'Gold Ore', src: assetUrl('assets/blocks/gold_ore.png'), rarity: 'rare' },
+  { type: 'tnt', name: 'TNT', src: assetUrl('assets/blocks/tnt.png'), rarity: 'epic' },
+  { type: 'obsidian', name: 'Obsidian', src: assetUrl('assets/blocks/obsidian.png'), rarity: 'epic' },
+  { type: 'crafting_table', name: 'Crafting Table', src: assetUrl('assets/blocks/crafting_table.png'), rarity: 'common' },
+  { type: 'water', name: 'Water', src: assetUrl('assets/blocks/water.png'), rarity: 'common' },
+  { type: 'powder_snow', name: 'Powder Snow', src: assetUrl('assets/blocks/powder_snow.png'), rarity: 'rare' },
+  { type: 'sticky_piston', name: 'Sticky Piston', src: assetUrl('assets/blocks/sticky_piston.png'), rarity: 'rare' },
+  { type: 'redstone_lamp', name: 'Redstone Lamp', src: assetUrl('assets/blocks/redstone_lamp.png'), rarity: 'rare' },
+  { type: 'dried_kelp', name: 'Dried Kelp Block', src: assetUrl('assets/blocks/dried_kelp_block.png'), rarity: 'common' }
 ];
 
 export function getCurrentUser(): User | null {

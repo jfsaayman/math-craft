@@ -72,9 +72,23 @@ export default function Home() {
                {/* Overall Progress Card */}
                <Card className="bg-[#c6c6c6] border-4 border-black p-4 rounded-none shadow-[4px_4px_0_rgba(0,0,0,0.5)] w-full max-w-[240px]">
                  <h3 className="font-display text-sm text-[#3f3f3f] uppercase mb-2 border-b-2 border-black/10 pb-1">Overall Stats</h3>
-                 <div className="flex items-center gap-3 mb-3 bg-white/30 p-2 border-2 border-black/10">
-                    <BarChart3 className="w-5 h-5 text-[#5555ff]" />
-                    <span className="font-display text-lg text-blue-700">{overallStats.count} Games</span>
+                 <div className="space-y-2 mb-3">
+                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
+                      <div className="flex items-center gap-2">
+                        <BarChart3 className="w-4 h-4 text-[#5555ff]" />
+                        <span className="font-display text-[10px]">GAMES</span>
+                      </div>
+                      <span className="font-display text-lg text-blue-700">{overallStats.count}</span>
+                   </div>
+                   <div className="flex items-center justify-between bg-white/30 p-2 border-2 border-black/10">
+                      <div className="flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-orange-500 fill-orange-500" />
+                        <span className="font-display text-[10px]">TOTAL XP</span>
+                      </div>
+                      <span className="font-display text-sm text-orange-700 truncate ml-2">
+                        {overallStats.totalScore.toLocaleString()}
+                      </span>
+                   </div>
                  </div>
                  <div className="grid grid-cols-2 gap-x-4 gap-y-2 text-sm font-bold text-[#3f3f3f]">
                     <div className="flex justify-between items-center bg-black/5 px-2 py-1">

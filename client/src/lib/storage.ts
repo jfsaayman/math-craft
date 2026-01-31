@@ -16,113 +16,104 @@ export interface GameRecord {
 
 export interface CollectedBlock {
   id: string;
+  userId: string;
   type: string; // 'grass', 'diamond', 'gold', 'tnt'
   name: string;
   date: string;
 }
 
-const HIGH_SCORES_KEY = 'math-craft-high-scores';
-const HISTORY_KEY = 'math-craft-history';
-const INVENTORY_KEY = 'math-craft-inventory';
+export interface User {
+  id: string;
+  name: string;
+  avatar: string;
+  gender: 'boy' | 'girl';
+}
 
-export const AVAILABLE_BLOCKS = [
-  { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass.png', rarity: 'common' },
-  { type: 'diamond', name: 'Diamond Ore', src: '/assets/blocks/diamond_ore.png', rarity: 'legendary' },
-  { type: 'gold', name: 'Gold Ore', src: '/assets/blocks/gold_ore.png', rarity: 'rare' },
-  { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' },
-  { type: 'obsidian', name: 'Obsidian', src: '/assets/blocks/obsidian.png', rarity: 'epic' },
-  { type: 'crafting_table', name: 'Crafting Table', src: '/assets/blocks/crafting_table.png', rarity: 'common' },
-  { type: 'water', name: 'Water', src: '/assets/blocks/water.png', rarity: 'common' },
-  { type: 'powder_snow', name: 'Powder Snow', src: '/assets/blocks/powder_snow.png', rarity: 'rare' },
-  { type: 'sticky_piston', name: 'Sticky Piston', src: '/assets/blocks/sticky_piston.png', rarity: 'rare' },
-  { type: 'redstone_lamp', name: 'Redstone Lamp', src: '/assets/blocks/redstone_lamp.png', rarity: 'rare' },
-  { type: 'dried_kelp', name: 'Dried Kelp Block', src: '/assets/blocks/dried_kelp_block.png', rarity: 'common' }
+export const USERS: User[] = [
+  { id: 'jake', name: 'Jake', avatar: '/assets/avatars/jake.png', gender: 'boy' },
+  { id: 'jeanie', name: 'Jeanie', avatar: '/assets/avatars/jeanie.png', gender: 'girl' }
 ];
 
+const CURRENT_USER_KEY = 'math-craft-current-user';
+
+export function getCurrentUser(): User | null {
+  const userId = localStorage.getItem(CURRENT_USER_KEY);
+  if (!userId) return null;
+  return USERS.find(u => u.id === userId) || null;
+}
+
+export function setCurrentUser(userId: string) {
+  localStorage.setItem(CURRENT_USER_KEY, userId);
+}
+
 export function getInventory(): CollectedBlock[] {
+  const user = getCurrentUser();
+  if (!user) return [];
   try {
     const data = localStorage.getItem(INVENTORY_KEY);
-    return data ? JSON.parse(data) : [];
+    const all = data ? JSON.parse(data) : [];
+    return all.filter((item: any) => item.userId === user.id);
   } catch (e) {
     return [];
   }
 }
 
 export function addToInventory(blockType: string) {
-  const inventory = getInventory();
+  const user = getCurrentUser();
+  if (!user) return [];
+  
+  const allData = localStorage.getItem(INVENTORY_KEY);
+  const allInventory = allData ? JSON.parse(allData) : [];
+  
   const blockDef = AVAILABLE_BLOCKS.find(b => b.type === blockType);
-  if (!blockDef) return inventory;
+  if (!blockDef) return getInventory();
 
   const newBlock: CollectedBlock = {
     id: crypto.randomUUID(),
+    userId: user.id,
     type: blockType,
     name: blockDef.name,
     date: new Date().toISOString()
   };
 
-  inventory.push(newBlock);
-  localStorage.setItem(INVENTORY_KEY, JSON.stringify(inventory));
-  return inventory;
-}
-
-export function getHighScores(): HighScore[] {
-  try {
-    const data = localStorage.getItem(HIGH_SCORES_KEY);
-    return data ? JSON.parse(data) : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-export function saveHighScore(name: string, score: number, mode: string) {
-  const scores = getHighScores();
-  const newScore: HighScore = {
-    id: crypto.randomUUID(),
-    name,
-    score,
-    date: new Date().toISOString(),
-    mode
-  };
-  
-  scores.push(newScore);
-  // Sort descending by score
-  scores.sort((a, b) => b.score - a.score);
-  // Keep top 10
-  const top10 = scores.slice(0, 10);
-  
-  localStorage.setItem(HIGH_SCORES_KEY, JSON.stringify(top10));
-  return top10;
+  allInventory.push(newBlock);
+  localStorage.setItem(INVENTORY_KEY, JSON.stringify(allInventory));
+  return getInventory();
 }
 
 export function getHistory(): GameRecord[] {
+  const user = getCurrentUser();
+  if (!user) return [];
   try {
     const data = localStorage.getItem(HISTORY_KEY);
-    return data ? JSON.parse(data) : [];
+    const all = data ? JSON.parse(data) : [];
+    return all.filter((item: any) => item.userId === user.id);
   } catch (e) {
     return [];
   }
 }
 
 export function saveGameToHistory(score: number, mode: string, details: string) {
-  const history = getHistory();
-  const record: GameRecord = {
+  const user = getCurrentUser();
+  if (!user) return [];
+  
+  const allData = localStorage.getItem(HISTORY_KEY);
+  const allHistory = allData ? JSON.parse(allData) : [];
+  
+  const record: GameRecord & { userId: string } = {
     id: crypto.randomUUID(),
+    userId: user.id,
     score,
     date: new Date().toISOString(),
     mode,
     details
   };
   
-  // Add to beginning
-  history.unshift(record);
+  allHistory.unshift(record);
+  if (allHistory.length > 500) allHistory.pop();
   
-  // Optional: Limit history size (e.g., keep last 100 games)
-  if (history.length > 100) {
-    history.pop();
-  }
-  
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(history));
-  return history;
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(allHistory));
+  return getHistory();
 }
 
 export function getTodayStats() {

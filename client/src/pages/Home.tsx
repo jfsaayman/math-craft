@@ -1,14 +1,16 @@
 import { useState, useEffect } from "react";
-import { Link } from "wouter";
+import { Link, useLocation } from "wouter";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { Rocket, Zap, CheckSquare, Trophy, Grid3X3, BarChart3 } from "lucide-react";
+import { Rocket, Zap, CheckSquare, Trophy, Grid3X3, BarChart3, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getTodayStats, getOverallStats, getInventory, AVAILABLE_BLOCKS } from "@/lib/storage";
+import { getTodayStats, getOverallStats, getInventory, AVAILABLE_BLOCKS, getCurrentUser, USERS, setCurrentUser } from "@/lib/storage";
 import { type Operation } from "@/lib/game-logic";
 
 export default function Home() {
+  const [location, setLocation] = useLocation();
+  const user = getCurrentUser();
   const [selectedTables, setSelectedTables] = useState<number[]>([2, 5, 10]); 
   const [operations, setOperations] = useState<Operation[]>(['multiply']);
   const [todayStats, setTodayStats] = useState(getTodayStats());
@@ -16,10 +18,19 @@ export default function Home() {
   const [inventoryCount, setInventoryCount] = useState(0);
 
   useEffect(() => {
+    if (!user) {
+      setLocation("/select-user");
+      return;
+    }
     setTodayStats(getTodayStats());
     setOverallStats(getOverallStats());
     setInventoryCount(getInventory().length);
-  }, []);
+  }, [user]);
+
+  const handleLogout = () => {
+    setCurrentUser("");
+    setLocation("/select-user");
+  };
 
   const toggleTable = (num: number) => {
     setSelectedTables(prev => 
@@ -57,6 +68,15 @@ export default function Home() {
         >
           <div className="flex flex-col md:flex-row items-center justify-center gap-4">
              <div className="text-center">
+               <div className="flex items-center justify-center gap-4 mb-4">
+                 <img src={user?.avatar} alt={user?.name} className="w-16 h-16 pixelated border-4 border-white shadow-[4px_4px_0_#000000]" />
+                 <div className="text-left">
+                    <h2 className="text-white font-display text-xl uppercase drop-shadow-[2px_2px_0_#000000]">Hero: {user?.name}</h2>
+                    <Button variant="link" className="text-white/60 p-0 h-auto font-display text-[10px] hover:text-white flex items-center gap-1" onClick={handleLogout}>
+                      <LogOut className="w-3 h-3" /> SWITCH HERO
+                    </Button>
+                 </div>
+               </div>
                <h1 className="text-4xl md:text-6xl text-[#ffffff] drop-shadow-[4px_4px_0_#000000] tracking-wider leading-tight">
                  MATH CRAFT
                </h1>

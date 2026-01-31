@@ -274,7 +274,7 @@ export default function Game() {
             alt="Character"
             animate={{ y: [0, -15, 0] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
-            className="w-40 absolute -top-32 left-1/2 -translate-x-1/2 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] z-20 [mix-blend-mode:multiply]"
+            className="w-40 absolute -top-32 left-1/2 -translate-x-1/2 drop-shadow-[0_4px_0_rgba(0,0,0,0.5)] z-20"
           />
           
           <AnimatePresence mode="wait">

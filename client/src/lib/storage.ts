@@ -9,15 +9,15 @@ export interface HighScore {
 export interface GameRecord {
   id: string;
   score: number;
-  date: string; // ISO string
-  mode: string; // 'practice' | 'time-attack'
-  details: string; // e.g., "Multiplication (Tables: 2,5,10)"
+  date: string;
+  mode: string;
+  details: string;
 }
 
 export interface CollectedBlock {
   id: string;
   userId: string;
-  type: string; // 'grass', 'diamond', 'gold', 'tnt'
+  type: string;
   name: string;
   date: string;
 }
@@ -35,6 +35,23 @@ export const USERS: User[] = [
 ];
 
 const CURRENT_USER_KEY = 'math-craft-current-user';
+const HIGH_SCORES_KEY = 'math-craft-high-scores';
+const HISTORY_KEY = 'math-craft-history';
+const INVENTORY_KEY = 'math-craft-inventory';
+
+export const AVAILABLE_BLOCKS = [
+  { type: 'grass', name: 'Grass Block', src: '/assets/blocks/grass.png', rarity: 'common' },
+  { type: 'diamond', name: 'Diamond Ore', src: '/assets/blocks/diamond_ore.png', rarity: 'legendary' },
+  { type: 'gold', name: 'Gold Ore', src: '/assets/blocks/gold_ore.png', rarity: 'rare' },
+  { type: 'tnt', name: 'TNT', src: '/assets/blocks/tnt.png', rarity: 'epic' },
+  { type: 'obsidian', name: 'Obsidian', src: '/assets/blocks/obsidian.png', rarity: 'epic' },
+  { type: 'crafting_table', name: 'Crafting Table', src: '/assets/blocks/crafting_table.png', rarity: 'common' },
+  { type: 'water', name: 'Water', src: '/assets/blocks/water.png', rarity: 'common' },
+  { type: 'powder_snow', name: 'Powder Snow', src: '/assets/blocks/powder_snow.png', rarity: 'rare' },
+  { type: 'sticky_piston', name: 'Sticky Piston', src: '/assets/blocks/sticky_piston.png', rarity: 'rare' },
+  { type: 'redstone_lamp', name: 'Redstone Lamp', src: '/assets/blocks/redstone_lamp.png', rarity: 'rare' },
+  { type: 'dried_kelp', name: 'Dried Kelp Block', src: '/assets/blocks/dried_kelp_block.png', rarity: 'common' }
+];
 
 export function getCurrentUser(): User | null {
   const userId = localStorage.getItem(CURRENT_USER_KEY);
@@ -51,8 +68,8 @@ export function getInventory(): CollectedBlock[] {
   if (!user) return [];
   try {
     const data = localStorage.getItem(INVENTORY_KEY);
-    const all = data ? JSON.parse(data) : [];
-    return all.filter((item: any) => item.userId === user.id);
+    const all: CollectedBlock[] = data ? JSON.parse(data) : [];
+    return all.filter((item) => item.userId === user.id);
   } catch (e) {
     return [];
   }
@@ -63,7 +80,7 @@ export function addToInventory(blockType: string) {
   if (!user) return [];
   
   const allData = localStorage.getItem(INVENTORY_KEY);
-  const allInventory = allData ? JSON.parse(allData) : [];
+  const allInventory: CollectedBlock[] = allData ? JSON.parse(allData) : [];
   
   const blockDef = AVAILABLE_BLOCKS.find(b => b.type === blockType);
   if (!blockDef) return getInventory();
@@ -81,13 +98,48 @@ export function addToInventory(blockType: string) {
   return getInventory();
 }
 
+export function getHighScores(): HighScore[] {
+  const user = getCurrentUser();
+  if (!user) return [];
+  try {
+    const data = localStorage.getItem(HIGH_SCORES_KEY);
+    const all: (HighScore & { userId?: string })[] = data ? JSON.parse(data) : [];
+    return all.filter((item) => item.userId === user.id);
+  } catch (e) {
+    return [];
+  }
+}
+
+export function saveHighScore(name: string, score: number, mode: string) {
+  const user = getCurrentUser();
+  if (!user) return [];
+  
+  const allData = localStorage.getItem(HIGH_SCORES_KEY);
+  const allScores: (HighScore & { userId: string })[] = allData ? JSON.parse(allData) : [];
+  
+  const newScore: HighScore & { userId: string } = {
+    id: crypto.randomUUID(),
+    userId: user.id,
+    name,
+    score,
+    date: new Date().toISOString(),
+    mode
+  };
+  
+  allScores.push(newScore);
+  allScores.sort((a, b) => b.score - a.score);
+  
+  localStorage.setItem(HIGH_SCORES_KEY, JSON.stringify(allScores));
+  return getHighScores();
+}
+
 export function getHistory(): GameRecord[] {
   const user = getCurrentUser();
   if (!user) return [];
   try {
     const data = localStorage.getItem(HISTORY_KEY);
-    const all = data ? JSON.parse(data) : [];
-    return all.filter((item: any) => item.userId === user.id);
+    const all: (GameRecord & { userId?: string })[] = data ? JSON.parse(data) : [];
+    return all.filter((item) => item.userId === user.id);
   } catch (e) {
     return [];
   }
@@ -98,7 +150,7 @@ export function saveGameToHistory(score: number, mode: string, details: string) 
   if (!user) return [];
   
   const allData = localStorage.getItem(HISTORY_KEY);
-  const allHistory = allData ? JSON.parse(allData) : [];
+  const allHistory: (GameRecord & { userId: string })[] = allData ? JSON.parse(allData) : [];
   
   const record: GameRecord & { userId: string } = {
     id: crypto.randomUUID(),
@@ -143,10 +195,10 @@ export function getOverallStats() {
 
 function calculateBreakdown(games: GameRecord[]) {
   return games.reduce((acc, game) => {
-    if (game.details.includes('Multiplication') || game.details.includes('Mixed') && game.details.includes('×')) acc['multiply'] = (acc['multiply'] || 0) + 1;
-    if (game.details.includes('Division') || game.details.includes('Mixed') && game.details.includes('÷')) acc['divide'] = (acc['divide'] || 0) + 1;
-    if (game.details.includes('Addition') || game.details.includes('Mixed') && game.details.includes('+')) acc['add'] = (acc['add'] || 0) + 1;
-    if (game.details.includes('Subtraction') || game.details.includes('Mixed') && game.details.includes('-')) acc['subtract'] = (acc['subtract'] || 0) + 1;
+    if (game.details.includes('Multiplication') || (game.details.includes('Mixed') && game.details.includes('×'))) acc['multiply'] = (acc['multiply'] || 0) + 1;
+    if (game.details.includes('Division') || (game.details.includes('Mixed') && game.details.includes('÷'))) acc['divide'] = (acc['divide'] || 0) + 1;
+    if (game.details.includes('Addition') || (game.details.includes('Mixed') && game.details.includes('+'))) acc['add'] = (acc['add'] || 0) + 1;
+    if (game.details.includes('Subtraction') || (game.details.includes('Mixed') && game.details.includes('-'))) acc['subtract'] = (acc['subtract'] || 0) + 1;
     
     return acc;
   }, {} as Record<string, number>);

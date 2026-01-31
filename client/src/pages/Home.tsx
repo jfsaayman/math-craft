@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Rocket, Zap, CheckSquare, Trophy, Grid3X3, BarChart3, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getTodayStats, getOverallStats, getInventory, AVAILABLE_BLOCKS, getCurrentUser, USERS, setCurrentUser } from "@/lib/storage";
+import { getTodayStats, getOverallStats, getInventory, getCurrentUser, setCurrentUser } from "@/lib/storage";
 import { type Operation } from "@/lib/game-logic";
 
 export default function Home() {

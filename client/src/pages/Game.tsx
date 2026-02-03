@@ -6,8 +6,10 @@ import { Card } from "@/components/ui/card";
 import { ArrowLeft, Clock, Zap, Award, Package } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Keypad } from "@/components/game/Keypad";
+import { MultipleChoice } from "@/components/game/MultipleChoice";
 import {
   generateProblem,
+  generateChoices,
   type Operation,
   type Problem,
 } from "@/lib/game-logic";
@@ -40,6 +42,10 @@ export default function Game() {
   const [problem, setProblem] = useState<Problem | null>(null);
   const [input, setInput] = useState("");
   const [score, setScore] = useState(0);
+  const [questionCount, setQuestionCount] = useState(0);
+  const [choices, setChoices] = useState<number[] | null>(null);
+
+  const isMultipleChoice = questionCount % 2 === 0 && questionCount > 0;
   const [timeLeft, setTimeLeft] = useState(60);
   const [gameState, setGameState] = useState<"playing" | "finished" | "reward">(
     "playing",
@@ -82,9 +88,21 @@ export default function Game() {
   const nextProblem = () => {
     // Pick random operation from selected list
     const randomOp = ops[Math.floor(Math.random() * ops.length)];
-    setProblem(generateProblem(randomOp, tables));
+    const newProblem = generateProblem(randomOp, tables);
+    setProblem(newProblem);
     setInput("");
     setFeedback("none");
+
+    // Increment question count and generate choices for even questions (2, 4, 6...)
+    setQuestionCount((prev) => {
+      const next = prev + 1;
+      if (next % 2 === 0) {
+        setChoices(generateChoices(newProblem.answer));
+      } else {
+        setChoices(null);
+      }
+      return next;
+    });
   };
 
   const finishGame = () => {
@@ -168,6 +186,30 @@ export default function Game() {
       setStreak(0);
       setTimeout(() => {
         setInput("");
+        setFeedback("none");
+      }, 500);
+    }
+  };
+
+  const handleMultipleChoiceSelect = (answer: number) => {
+    if (!problem) return;
+
+    if (answer === problem.answer) {
+      setScore((s) => s + 10 + streak * 2);
+      setStreak((s) => s + 1);
+      setFeedback("correct");
+      confetti({
+        particleCount: 30,
+        spread: 40,
+        origin: { y: 0.6 },
+        colors: ["#55ff55", "#ffffff"],
+        shapes: ["square"],
+      });
+      setTimeout(nextProblem, 600);
+    } else {
+      setFeedback("wrong");
+      setStreak(0);
+      setTimeout(() => {
         setFeedback("none");
       }, 500);
     }
@@ -346,19 +388,23 @@ export default function Game() {
 
                 <div className="text-5xl md:text-6xl font-readable font-bold text-white tracking-widest drop-shadow-[3px_3px_0_#000000]">
                   {problem ? (
-                    <div className="flex items-center justify-center gap-4">
-                      <span>{problem.display.split("?")[0]}</span>
-                      <span
-                        className={cn(
-                          "bg-black/30 min-w-[1.5em] px-2 border-b-4",
-                          input
-                            ? "border-white"
-                            : "border-white/20 animate-pulse",
-                        )}
-                      >
-                        {input || "?"}
-                      </span>
-                    </div>
+                    isMultipleChoice ? (
+                      <span>{problem.display}</span>
+                    ) : (
+                      <div className="flex items-center justify-center gap-4">
+                        <span>{problem.display.split("?")[0]}</span>
+                        <span
+                          className={cn(
+                            "bg-black/30 min-w-[1.5em] px-2 border-b-4",
+                            input
+                              ? "border-white"
+                              : "border-white/20 animate-pulse",
+                          )}
+                        >
+                          {input || "?"}
+                        </span>
+                      </div>
+                    )
                   ) : (
                     "..."
                   )}
@@ -368,13 +414,21 @@ export default function Game() {
           </AnimatePresence>
         </div>
 
-        {/* Keypad */}
-        <Keypad
-          onInput={handleInput}
-          onDelete={handleDelete}
-          onSubmit={handleSubmit}
-          disabled={feedback !== "none"}
-        />
+        {/* Input Area: Multiple Choice or Keypad */}
+        {isMultipleChoice && choices ? (
+          <MultipleChoice
+            options={choices}
+            onSelect={handleMultipleChoiceSelect}
+            disabled={feedback !== "none"}
+          />
+        ) : (
+          <Keypad
+            onInput={handleInput}
+            onDelete={handleDelete}
+            onSubmit={handleSubmit}
+            disabled={feedback !== "none"}
+          />
+        )}
       </div>
     </div>
   );

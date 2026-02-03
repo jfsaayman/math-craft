@@ -8,6 +8,33 @@ export interface Problem {
   display: string;
 }
 
+export function generateChoices(correctAnswer: number): number[] {
+  const distractors = new Set<number>();
+
+  // Off-by-one errors
+  distractors.add(correctAnswer + 1);
+  distractors.add(correctAnswer - 1);
+
+  // Off-by-small amounts (2-5)
+  distractors.add(correctAnswer + Math.floor(Math.random() * 4) + 2);
+  distractors.add(correctAnswer - Math.floor(Math.random() * 4) - 2);
+
+  // Off-by-ten (place value confusion)
+  if (correctAnswer >= 10) {
+    distractors.add(correctAnswer + 10);
+    distractors.add(correctAnswer - 10);
+  }
+
+  // Filter invalid (negative, zero, same as correct) and pick 3
+  const valid = Array.from(distractors)
+    .filter(d => d > 0 && d !== correctAnswer)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+
+  // Combine with correct answer and shuffle
+  return [...valid, correctAnswer].sort(() => Math.random() - 0.5);
+}
+
 export const generateProblem = (operation: Operation, selectedTables: number[]): Problem => {
   // Default to 1-12 if nothing selected (shouldn't happen with UI validation)
   const tables = selectedTables.length > 0 ? selectedTables : [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];

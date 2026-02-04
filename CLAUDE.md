@@ -48,7 +48,7 @@ The `game-logic.ts` module generates math problems with these rules:
 - Division/subtraction ensure integer positive results
 
 ### Styling
-- Minecraft-themed pixel art aesthetic
+- Pixel art aesthetic
 - Custom pixelated font via `font-display` class
 - Pixel shadow effects: `shadow-[4px_4px_0_...]`
 

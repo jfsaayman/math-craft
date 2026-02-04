@@ -1,26 +1,20 @@
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Grid3X3 } from "lucide-react";
-import { getInventory, AVAILABLE_BLOCKS, type CollectedBlock } from "@/lib/storage";
+import { ArrowLeft } from "lucide-react";
+import { getBlockCounts, AVAILABLE_BLOCKS } from "@/lib/storage";
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 
 export default function Collection() {
-  const [inventory, setInventory] = useState<CollectedBlock[]>([]);
+  const [blockCounts, setBlockCounts] = useState<Record<string, number>>({});
 
   useEffect(() => {
-    setInventory(getInventory());
+    setBlockCounts(getBlockCounts());
   }, []);
 
-  // Group inventory by type to show counts
-  const groupedInventory = inventory.reduce((acc, item) => {
-    acc[item.type] = (acc[item.type] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
-
   return (
-    <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center font-body flex flex-col items-center p-4">
+    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center font-body flex flex-col items-center p-4">
       <div className="absolute inset-0 bg-black/40 pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-4xl">
@@ -38,7 +32,7 @@ export default function Collection() {
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           {AVAILABLE_BLOCKS.map((block) => {
-            const count = groupedInventory[block.type] || 0;
+            const count = blockCounts[block.type] || 0;
             const isUnlocked = count > 0;
             
             return (
@@ -87,7 +81,7 @@ export default function Collection() {
           })}
         </div>
         
-        {inventory.length === 0 && (
+        {Object.keys(blockCounts).length === 0 && (
           <div className="bg-[#c6c6c6] border-4 border-black p-8 text-center mt-12">
             <p className="font-body text-xl text-[#3f3f3f]">You haven't collected any blocks yet!</p>
             <p className="text-black/60">Play games to earn rewards.</p>

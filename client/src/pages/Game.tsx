@@ -3,7 +3,7 @@ import { Link, useLocation } from "wouter";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
-import { ArrowLeft, Clock, Zap, Award, Package } from "lucide-react";
+import { ArrowLeft, Clock, Zap } from "lucide-react";
 import confetti from "canvas-confetti";
 import { Keypad } from "@/components/game/Keypad";
 import { MultipleChoice } from "@/components/game/MultipleChoice";
@@ -15,14 +15,10 @@ import {
 } from "@/lib/game-logic";
 import { cn } from "@/lib/utils";
 import {
-  saveHighScore,
-  getHighScores,
-  saveGameToHistory,
-  type HighScore,
   AVAILABLE_BLOCKS,
-  addToInventory,
+  recordGameComplete,
+  recordBlockCollected,
 } from "@/lib/storage";
-import { Input } from "@/components/ui/input";
 
 export default function Game() {
   const [location, setLocation] = useLocation();
@@ -54,9 +50,6 @@ export default function Game() {
     "none",
   );
   const [streak, setStreak] = useState(0);
-  const [highScores, setHighScores] = useState<HighScore[]>([]);
-  const [playerName, setPlayerName] = useState("");
-  const [scoreSaved, setScoreSaved] = useState(false);
 
   // Reward State
   const [rewardOptions, setRewardOptions] = useState<typeof AVAILABLE_BLOCKS>(
@@ -121,9 +114,7 @@ export default function Game() {
       return o;
     });
 
-    const details = `Mixed (${opNames.join(", ")}) (Tables: ${tables.join(",")})`;
-    saveGameToHistory(score, mode, details);
-    setHighScores(getHighScores());
+    recordGameComplete(score);
 
     if (score > 0) {
       confetti({
@@ -136,15 +127,8 @@ export default function Game() {
     }
   };
 
-  const handleSaveScore = () => {
-    if (!playerName.trim()) return;
-    const updatedScores = saveHighScore(playerName, score, mode);
-    setHighScores(updatedScores);
-    setScoreSaved(true);
-  };
-
   const handleSelectReward = (block: (typeof AVAILABLE_BLOCKS)[0]) => {
-    addToInventory(block.type);
+    recordBlockCollected(block.type);
     setSelectedReward(block);
     setGameState("reward");
     confetti({
@@ -156,8 +140,16 @@ export default function Game() {
   };
 
   const handleInput = (num: number) => {
-    if (input.length < 3) {
-      setInput((prev) => prev + num.toString());
+    if (feedback !== "none") return;
+    if (!problem) return;
+    if (input.length >= 3) return;
+
+    const nextInput = input + num.toString();
+    setInput(nextInput);
+
+    const expectedLength = String(problem.answer).length;
+    if (nextInput.length >= expectedLength) {
+      handleSubmitValue(nextInput);
     }
   };
 
@@ -165,10 +157,10 @@ export default function Game() {
     setInput((prev) => prev.slice(0, -1));
   };
 
-  const handleSubmit = () => {
-    if (!problem || !input) return;
+  const handleSubmitValue = (value: string) => {
+    if (!problem || !value) return;
 
-    const val = parseInt(input);
+    const val = parseInt(value);
     if (val === problem.answer) {
       setScore((s) => s + 10 + streak * 2);
       setStreak((s) => s + 1);
@@ -190,6 +182,7 @@ export default function Game() {
       }, 500);
     }
   };
+
 
   const handleMultipleChoiceSelect = (answer: number) => {
     if (!problem) return;
@@ -217,7 +210,7 @@ export default function Game() {
 
   if (gameState === "finished" || gameState === "reward") {
     return (
-      <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/60" />
         <Card className="max-w-2xl w-full bg-[#c6c6c6] border-4 border-black p-0 rounded-none relative z-10 shadow-[10px_10px_0_#000000]">
           <div className="bg-[#8b8b8b] p-3 border-b-4 border-black text-center">
@@ -321,7 +314,7 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center flex flex-col items-center p-4 font-body">
+    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center flex flex-col items-center p-4 font-body">
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
       {/* Header */}
@@ -425,7 +418,6 @@ export default function Game() {
           <Keypad
             onInput={handleInput}
             onDelete={handleDelete}
-            onSubmit={handleSubmit}
             disabled={feedback !== "none"}
           />
         )}

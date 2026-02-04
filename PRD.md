@@ -8,13 +8,13 @@
 
 ## Executive Summary
 
-Math Craft is a Progressive Web Application (PWA) that gamifies arithmetic practice for children through an engaging Minecraft-themed interface. The application provides timed math challenges across four operations (multiplication, division, addition, subtraction) and rewards players with collectible Minecraft blocks. Built with React and designed for offline-first mobile experiences, Math Craft supports multiple users and tracks individual progress through localStorage.
+Math Craft is a Progressive Web Application (PWA) that gamifies arithmetic practice for children through an engaging interface. The application provides timed math challenges across four operations (multiplication, division, addition, subtraction) and rewards players with collectible blocks. Built with React and designed for offline-first mobile experiences, Math Craft supports multiple users and tracks individual progress through localStorage.
 
 ### Key Highlights
 - **Target Audience:** Children aged 6-12 practicing basic arithmetic
 - **Platform:** Browser-based PWA (mobile-first, installable)
 - **Core Mechanic:** 60-second timed challenges with streak bonuses
-- **Unique Value:** Combines education with collectible rewards and Minecraft aesthetics
+- **Unique Value:** Combines education with collectible rewards
 - **Data Model:** Client-side only (localStorage), no backend required
 
 ---
@@ -119,7 +119,7 @@ Children need consistent, engaging practice to master arithmetic fundamentals, b
 - As a student, I want a fair challenge that doesn't include problems I haven't learned yet
 
 ### 4. Collectible Block Rewards
-**Description:** After each game session, players choose one collectible Minecraft block from three random options.
+**Description:** After each game session, players choose one collectible block from three random options.
 
 **Details:**
 - **Rarity Tiers:**
@@ -448,7 +448,7 @@ interface GameRecord {
 
 ## UI/UX Design Principles
 
-### Visual Theme: Minecraft Aesthetic
+### Visual Theme: Pixel Aesthetic
 1. **Pixelated Graphics:**
    - All block images rendered with `image-rendering: pixelated`
    - Custom pixel font for headings (`font-display` class)
@@ -457,7 +457,7 @@ interface GameRecord {
 2. **Color Palette:**
    - Stone gray: `#c6c6c6` (primary UI background)
    - Dark gray: `#3f3f3f` (text on light backgrounds)
-   - Minecraft grass green: `#4ade80` (theme accent)
+   - Grass green: `#4ade80` (theme accent)
    - Black borders: 4px solid for all cards/buttons
 
 3. **Shadow Style:**
@@ -466,7 +466,7 @@ interface GameRecord {
    - No soft/blurred shadows
 
 4. **Background:**
-   - Full-screen Minecraft-style background image
+   - Full-screen Pixel Art background image
    - Dark overlay (40% black) for content legibility
    - Fixed positioning (no parallax)
 

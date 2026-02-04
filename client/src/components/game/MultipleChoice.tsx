@@ -24,7 +24,7 @@ export function MultipleChoice({ options, onSelect, disabled }: MultipleChoicePr
     show: { y: 0, opacity: 1 }
   };
 
-  // Minecraft button style (same as Keypad)
+  // button style (same as Keypad)
   const mcButtonStyle = "relative active:top-1 border-b-4 border-black/50 active:border-b-0 bg-[#7c7c7c] hover:bg-[#8c8c8c] text-white font-display text-3xl shadow-[inset_-2px_-2px_0_rgba(0,0,0,0.5),inset_2px_2px_0_rgba(255,255,255,0.2)] rounded-none";
 
   return (

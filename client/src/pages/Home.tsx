@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Rocket, Zap, CheckSquare, Trophy, Grid3X3, BarChart3, LogOut } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { getTodayStats, getOverallStats, getInventory, getCurrentUser, setCurrentUser } from "@/lib/storage";
+import { getTodayStats, getOverallStats, getTotalBlocksCollected, getCurrentUser, setCurrentUser } from "@/lib/storage";
 import { type Operation } from "@/lib/game-logic";
 
 export default function Home() {
@@ -24,7 +24,7 @@ export default function Home() {
     }
     setTodayStats(getTodayStats());
     setOverallStats(getOverallStats());
-    setInventoryCount(getInventory().length);
+    setInventoryCount(getTotalBlocksCollected());
   }, [user]);
 
   const handleLogout = () => {
@@ -55,7 +55,7 @@ export default function Home() {
   const clearAll = () => setSelectedTables([]);
 
   return (
-    <div className="min-h-screen bg-[url('/assets/minecraft-bg.png')] bg-cover bg-center font-body flex flex-col items-center">
+    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center font-body flex flex-col items-center">
       <div className="absolute inset-0 bg-black/40 pointer-events-none" /> 
       
       <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col items-center min-h-screen max-w-5xl">
@@ -120,7 +120,7 @@ export default function Home() {
               <BarChart3 className="w-5 h-5 text-white" />
               <span className="font-display text-white text-shadow-sm uppercase">Hall of Fame Stats</span>
             </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
               {/* Total Games */}
               <div className="flex flex-col items-center justify-center p-4 bg-white/20 border-4 border-black/10">
                 <span className="font-display text-xs text-[#3f3f3f] mb-2 uppercase">Total Missions</span>
@@ -139,26 +139,6 @@ export default function Home() {
                   </span>
                 </div>
               </div>
-
-              {/* Skills Breakdown */}
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">×</span>
-                  <span className="font-display text-lg">{overallStats.breakdown?.multiply || 0}</span>
-                </div>
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">÷</span>
-                  <span className="font-display text-lg">{overallStats.breakdown?.divide || 0}</span>
-                </div>
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">+</span>
-                  <span className="font-display text-lg">{overallStats.breakdown?.add || 0}</span>
-                </div>
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">-</span>
-                  <span className="font-display text-lg">{overallStats.breakdown?.subtract || 0}</span>
-                </div>
-              </div>
             </div>
           </Card>
         </motion.div>
@@ -175,7 +155,7 @@ export default function Home() {
               <Rocket className="w-5 h-5 text-white" />
               <span className="font-display text-white text-shadow-sm uppercase">Today's Progress</span>
             </div>
-            <div className="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div className="p-6 grid grid-cols-1 md:grid-cols-2 gap-8">
               <div className="flex flex-col items-center justify-center p-4 bg-white/20 border-4 border-black/10">
                 <span className="font-display text-xs text-[#3f3f3f] mb-2 uppercase">Today's Missions</span>
                 <span className="font-display text-4xl text-green-700 drop-shadow-[2px_2px_0_rgba(255,255,255,0.5)]">
@@ -187,24 +167,6 @@ export default function Home() {
                 <span className="font-display text-4xl text-blue-700 drop-shadow-[2px_2px_0_rgba(255,255,255,0.5)]">
                   {todayStats.totalScore.toLocaleString()}
                 </span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">×</span>
-                  <span className="font-display text-lg">{todayStats.breakdown?.multiply || 0}</span>
-                </div>
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">÷</span>
-                  <span className="font-display text-lg">{todayStats.breakdown?.divide || 0}</span>
-                </div>
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">+</span>
-                  <span className="font-display text-lg">{todayStats.breakdown?.add || 0}</span>
-                </div>
-                <div className="flex justify-between items-center bg-black/10 px-4 py-2 border-2 border-black/5">
-                  <span className="font-display text-xl">-</span>
-                  <span className="font-display text-lg">{todayStats.breakdown?.subtract || 0}</span>
-                </div>
               </div>
             </div>
           </Card>

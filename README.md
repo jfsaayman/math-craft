@@ -2,7 +2,7 @@
 
 **Build Your Brain Power!**
 
-Math Craft is an educational math practice game built as a Progressive Web App (PWA) with a Minecraft-themed aesthetic. It helps children practice arithmetic through engaging gameplay, rewarding them with collectible Minecraft blocks.
+Math Craft is an educational math practice game built as a Progressive Web App (PWA). It helps children practice arithmetic through engaging gameplay, rewarding them with collectible blocks.
 
 ![Math Craft Screenshot](client/public/opengraph.jpg)
 
@@ -11,7 +11,7 @@ Math Craft is an educational math practice game built as a Progressive Web App (
 - **Four Operations** - Practice multiplication, division, addition, and subtraction
 - **Customizable Tables** - Select any combination of tables 1-12
 - **60-Second Challenges** - Time-attack mode with streak bonuses
-- **Block Collection** - Earn Minecraft blocks (Common, Rare, Epic, Legendary rarities)
+- **Block Collection** - Earn blocks (Common, Rare, Epic, Legendary rarities)
 - **Multi-User Support** - Track progress for multiple players
 - **Offline Support** - Works without internet connection (PWA)
 - **Mobile Friendly** - Installable on phones and tablets

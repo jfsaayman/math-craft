@@ -2,30 +2,6 @@
 const BASE_URL = import.meta.env.BASE_URL || '/';
 export const assetUrl = (path: string) => `${BASE_URL}${path.startsWith('/') ? path.slice(1) : path}`;
 
-export interface HighScore {
-  id: string;
-  name: string;
-  score: number;
-  date: string;
-  mode: string;
-}
-
-export interface GameRecord {
-  id: string;
-  score: number;
-  date: string;
-  mode: string;
-  details: string;
-}
-
-export interface CollectedBlock {
-  id: string;
-  userId: string;
-  type: string;
-  name: string;
-  date: string;
-}
-
 export interface User {
   id: string;
   name: string;
@@ -33,177 +9,190 @@ export interface User {
   gender: 'boy' | 'girl';
 }
 
+export interface UserStats {
+  totalMissions: number;
+  totalXP: number;
+  todayMissions: number;
+  todayXP: number;
+  todayDate: string;  // ISO date string (YYYY-MM-DD)
+  blocks: Record<string, number>;  // { gold_block: 5, diamond_block: 2, ... }
+}
+
+interface CookieData {
+  currentUser: string;
+  users: Record<string, UserStats>;
+}
+
 export const USERS: User[] = [
   { id: 'jake', name: 'Jake', avatar: assetUrl('assets/avatars/jake.png'), gender: 'boy' },
-  { id: 'jeanie', name: 'Jeanie', avatar: assetUrl('assets/avatars/jeanie.png'), gender: 'girl' }
+  { id: 'jeanie', name: 'Jeanie', avatar: assetUrl('assets/avatars/jeanie.png'), gender: 'girl' },
+  { id: 'chris', name: 'Chris', avatar: assetUrl('assets/avatars/chris.png'), gender: 'boy' },
+  { id: 'fienie', name: 'Fienie', avatar: assetUrl('assets/avatars/fienie.png'), gender: 'girl' }
 ];
-
-const CURRENT_USER_KEY = 'math-craft-current-user';
-const HIGH_SCORES_KEY = 'math-craft-high-scores';
-const HISTORY_KEY = 'math-craft-history';
-const INVENTORY_KEY = 'math-craft-inventory';
 
 export const AVAILABLE_BLOCKS = [
-  { type: 'grass', name: 'Grass Block', src: assetUrl('assets/blocks/grass.png'), rarity: 'common' },
-  { type: 'diamond', name: 'Diamond Ore', src: assetUrl('assets/blocks/diamond_ore.png'), rarity: 'legendary' },
-  { type: 'gold', name: 'Gold Ore', src: assetUrl('assets/blocks/gold_ore.png'), rarity: 'rare' },
-  { type: 'tnt', name: 'TNT', src: assetUrl('assets/blocks/tnt.png'), rarity: 'epic' },
-  { type: 'obsidian', name: 'Obsidian', src: assetUrl('assets/blocks/obsidian.png'), rarity: 'epic' },
-  { type: 'crafting_table', name: 'Crafting Table', src: assetUrl('assets/blocks/crafting_table.png'), rarity: 'common' },
-  { type: 'water', name: 'Water', src: assetUrl('assets/blocks/water.png'), rarity: 'common' },
-  { type: 'powder_snow', name: 'Powder Snow', src: assetUrl('assets/blocks/powder_snow.png'), rarity: 'rare' },
-  { type: 'sticky_piston', name: 'Sticky Piston', src: assetUrl('assets/blocks/sticky_piston.png'), rarity: 'rare' },
-  { type: 'redstone_lamp', name: 'Redstone Lamp', src: assetUrl('assets/blocks/redstone_lamp.png'), rarity: 'rare' },
-  { type: 'dried_kelp', name: 'Dried Kelp Block', src: assetUrl('assets/blocks/dried_kelp_block.png'), rarity: 'common' }
+  { type: 'gold_block', name: 'Gold Block', src: assetUrl('assets/blocks/gold_block.png'), rarity: 'rare' },
+  { type: 'diamond_block', name: 'Diamond Block', src: assetUrl('assets/blocks/diamond_block.png'), rarity: 'rare' },
+  { type: 'treasure_chest', name: 'Treasure Chest', src: assetUrl('assets/blocks/treasure_chest.png'), rarity: 'epic' },
+  { type: 'sword', name: 'Sword', src: assetUrl('assets/blocks/sword.png'), rarity: 'legendary' },
+  { type: 'cannon', name: 'Cannon', src: assetUrl('assets/blocks/cannon.png'), rarity: 'legendary' },
+  { type: 'machine_gun', name: 'Machine Gun', src: assetUrl('assets/blocks/machine_gun.png'), rarity: 'epic' },
+  { type: 'magic_wand', name: 'Magic Wand', src: assetUrl('assets/blocks/magic_wand.png'), rarity: 'rare' },
+  { type: 'explosives', name: 'Explosives', src: assetUrl('assets/blocks/explosives.png'), rarity: 'epic' },
+  { type: 'chocolate', name: 'Chocolate', src: assetUrl('assets/blocks/chocolate.png'), rarity: 'common' },
+  { type: 'coin', name: 'Coin', src: assetUrl('assets/blocks/coin.png'), rarity: 'common' },
+  { type: 'apple', name: 'Apple', src: assetUrl('assets/blocks/apple.png'), rarity: 'common' },
+  { type: 'hamburger', name: 'Hamburger', src: assetUrl('assets/blocks/hamburger.png'), rarity: 'common' }
 ];
 
+const COOKIE_NAME = 'math-craft-data';
+const COOKIE_EXPIRY_DAYS = 365;
+
+// Low-level cookie helpers
+function getCookie(name: string): string | null {
+  const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+  return match ? decodeURIComponent(match[2]) : null;
+}
+
+function setCookie(name: string, value: string, days: number): void {
+  const expires = new Date(Date.now() + days * 24 * 60 * 60 * 1000).toUTCString();
+  document.cookie = `${name}=${encodeURIComponent(value)}; expires=${expires}; path=/; SameSite=Lax`;
+}
+
+function getDefaultUserStats(): UserStats {
+  return {
+    totalMissions: 0,
+    totalXP: 0,
+    todayMissions: 0,
+    todayXP: 0,
+    todayDate: getTodayDateString(),
+    blocks: {}
+  };
+}
+
+function getTodayDateString(): string {
+  return new Date().toISOString().split('T')[0];
+}
+
+function getCookieData(): CookieData {
+  const raw = getCookie(COOKIE_NAME);
+  if (raw) {
+    try {
+      return JSON.parse(raw);
+    } catch {
+      // Invalid JSON, reset
+    }
+  }
+  return { currentUser: '', users: {} };
+}
+
+function saveCookieData(data: CookieData): void {
+  setCookie(COOKIE_NAME, JSON.stringify(data), COOKIE_EXPIRY_DAYS);
+}
+
+// User management
 export function getCurrentUser(): User | null {
-  const userId = localStorage.getItem(CURRENT_USER_KEY);
-  if (!userId) return null;
-  return USERS.find(u => u.id === userId) || null;
+  const data = getCookieData();
+  if (!data.currentUser) return null;
+  return USERS.find(u => u.id === data.currentUser) || null;
 }
 
-export function setCurrentUser(userId: string) {
-  localStorage.setItem(CURRENT_USER_KEY, userId);
-}
-
-export function getInventory(): CollectedBlock[] {
-  const user = getCurrentUser();
-  if (!user) return [];
-  try {
-    const data = localStorage.getItem(INVENTORY_KEY);
-    const all: CollectedBlock[] = data ? JSON.parse(data) : [];
-    return all.filter((item) => item.userId === user.id);
-  } catch (e) {
-    return [];
+export function setCurrentUser(userId: string): void {
+  const data = getCookieData();
+  data.currentUser = userId;
+  // Initialize user stats if not exists
+  if (userId && !data.users[userId]) {
+    data.users[userId] = getDefaultUserStats();
   }
+  saveCookieData(data);
 }
 
-export function addToInventory(blockType: string) {
-  const user = getCurrentUser();
-  if (!user) return [];
-  
-  const allData = localStorage.getItem(INVENTORY_KEY);
-  const allInventory: CollectedBlock[] = allData ? JSON.parse(allData) : [];
-  
-  const blockDef = AVAILABLE_BLOCKS.find(b => b.type === blockType);
-  if (!blockDef) return getInventory();
+// Stats management
+export function getUserStats(userId: string): UserStats {
+  const data = getCookieData();
+  const stats = data.users[userId] || getDefaultUserStats();
 
-  const newBlock: CollectedBlock = {
-    id: crypto.randomUUID(),
-    userId: user.id,
-    type: blockType,
-    name: blockDef.name,
-    date: new Date().toISOString()
-  };
-
-  allInventory.push(newBlock);
-  localStorage.setItem(INVENTORY_KEY, JSON.stringify(allInventory));
-  return getInventory();
-}
-
-export function getHighScores(): HighScore[] {
-  const user = getCurrentUser();
-  if (!user) return [];
-  try {
-    const data = localStorage.getItem(HIGH_SCORES_KEY);
-    const all: (HighScore & { userId?: string })[] = data ? JSON.parse(data) : [];
-    return all.filter((item) => item.userId === user.id);
-  } catch (e) {
-    return [];
+  // Check for day rollover
+  const today = getTodayDateString();
+  if (stats.todayDate !== today) {
+    stats.todayMissions = 0;
+    stats.todayXP = 0;
+    stats.todayDate = today;
+    // Save the reset stats
+    data.users[userId] = stats;
+    saveCookieData(data);
   }
+
+  return stats;
 }
 
-export function saveHighScore(name: string, score: number, mode: string) {
+export function saveUserStats(userId: string, stats: UserStats): void {
+  const data = getCookieData();
+  data.users[userId] = stats;
+  saveCookieData(data);
+}
+
+// Game recording functions
+export function recordGameComplete(score: number): void {
   const user = getCurrentUser();
-  if (!user) return [];
-  
-  const allData = localStorage.getItem(HIGH_SCORES_KEY);
-  const allScores: (HighScore & { userId: string })[] = allData ? JSON.parse(allData) : [];
-  
-  const newScore: HighScore & { userId: string } = {
-    id: crypto.randomUUID(),
-    userId: user.id,
-    name,
-    score,
-    date: new Date().toISOString(),
-    mode
-  };
-  
-  allScores.push(newScore);
-  allScores.sort((a, b) => b.score - a.score);
-  
-  localStorage.setItem(HIGH_SCORES_KEY, JSON.stringify(allScores));
-  return getHighScores();
+  if (!user) return;
+
+  const stats = getUserStats(user.id);
+  stats.totalMissions += 1;
+  stats.totalXP += score;
+  stats.todayMissions += 1;
+  stats.todayXP += score;
+
+  saveUserStats(user.id, stats);
 }
 
-export function getHistory(): GameRecord[] {
+export function recordBlockCollected(blockType: string): void {
   const user = getCurrentUser();
-  if (!user) return [];
-  try {
-    const data = localStorage.getItem(HISTORY_KEY);
-    const all: (GameRecord & { userId?: string })[] = data ? JSON.parse(data) : [];
-    return all.filter((item) => item.userId === user.id);
-  } catch (e) {
-    return [];
-  }
+  if (!user) return;
+
+  const stats = getUserStats(user.id);
+  stats.blocks[blockType] = (stats.blocks[blockType] || 0) + 1;
+
+  saveUserStats(user.id, stats);
 }
 
-export function saveGameToHistory(score: number, mode: string, details: string) {
+// Stats retrieval functions
+export function getTodayStats(): { count: number; totalScore: number } {
   const user = getCurrentUser();
-  if (!user) return [];
-  
-  const allData = localStorage.getItem(HISTORY_KEY);
-  const allHistory: (GameRecord & { userId: string })[] = allData ? JSON.parse(allData) : [];
-  
-  const record: GameRecord & { userId: string } = {
-    id: crypto.randomUUID(),
-    userId: user.id,
-    score,
-    date: new Date().toISOString(),
-    mode,
-    details
-  };
-  
-  allHistory.unshift(record);
-  if (allHistory.length > 500) allHistory.pop();
-  
-  localStorage.setItem(HISTORY_KEY, JSON.stringify(allHistory));
-  return getHistory();
-}
+  if (!user) return { count: 0, totalScore: 0 };
 
-export function getTodayStats() {
-  const history = getHistory();
-  const today = new Date().toDateString();
-  
-  const todayGames = history.filter(game => new Date(game.date).toDateString() === today);
-
+  const stats = getUserStats(user.id);
   return {
-    count: todayGames.length,
-    totalScore: todayGames.reduce((acc, curr) => acc + curr.score, 0),
-    games: todayGames,
-    breakdown: calculateBreakdown(todayGames)
+    count: stats.todayMissions,
+    totalScore: stats.todayXP
   };
 }
 
-export function getOverallStats() {
-  const history = getHistory();
-  
+export function getOverallStats(): { count: number; totalScore: number } {
+  const user = getCurrentUser();
+  if (!user) return { count: 0, totalScore: 0 };
+
+  const stats = getUserStats(user.id);
   return {
-    count: history.length,
-    totalScore: history.reduce((acc, curr) => acc + curr.score, 0),
-    games: history,
-    breakdown: calculateBreakdown(history)
+    count: stats.totalMissions,
+    totalScore: stats.totalXP
   };
 }
 
-function calculateBreakdown(games: GameRecord[]) {
-  return games.reduce((acc, game) => {
-    if (game.details.includes('Multiplication') || (game.details.includes('Mixed') && game.details.includes('×'))) acc['multiply'] = (acc['multiply'] || 0) + 1;
-    if (game.details.includes('Division') || (game.details.includes('Mixed') && game.details.includes('÷'))) acc['divide'] = (acc['divide'] || 0) + 1;
-    if (game.details.includes('Addition') || (game.details.includes('Mixed') && game.details.includes('+'))) acc['add'] = (acc['add'] || 0) + 1;
-    if (game.details.includes('Subtraction') || (game.details.includes('Mixed') && game.details.includes('-'))) acc['subtract'] = (acc['subtract'] || 0) + 1;
-    
-    return acc;
-  }, {} as Record<string, number>);
+export function getBlockCounts(): Record<string, number> {
+  const user = getCurrentUser();
+  if (!user) return {};
+
+  const stats = getUserStats(user.id);
+  return stats.blocks;
+}
+
+export function getUniqueBlocksCollected(): number {
+  const blocks = getBlockCounts();
+  return Object.keys(blocks).filter(k => blocks[k] > 0).length;
+}
+
+export function getTotalBlocksCollected(): number {
+  const blocks = getBlockCounts();
+  return Object.values(blocks).reduce((sum, count) => sum + count, 0);
 }

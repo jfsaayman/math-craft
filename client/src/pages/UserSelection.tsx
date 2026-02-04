@@ -13,7 +13,7 @@ export default function UserSelection() {
   };
 
   return (
-    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center font-body flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[url('/assets/background.jpg')] bg-cover bg-center font-body flex flex-col items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/60 pointer-events-none" />
       
       <motion.div 

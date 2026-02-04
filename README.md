@@ -4,8 +4,6 @@
 
 Math Craft is an educational math practice game built as a Progressive Web App (PWA). It helps children practice arithmetic through engaging gameplay, rewarding them with collectible blocks.
 
-![Math Craft Screenshot](client/public/opengraph.jpg)
-
 ## Features
 
 - **Four Operations** - Practice multiplication, division, addition, and subtraction

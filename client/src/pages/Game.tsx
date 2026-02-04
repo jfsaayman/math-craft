@@ -210,7 +210,7 @@ export default function Game() {
 
   if (gameState === "finished" || gameState === "reward") {
     return (
-      <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center flex items-center justify-center p-4">
+      <div className="min-h-screen bg-[url('/assets/background.jpg')] bg-cover bg-center flex items-center justify-center p-4">
         <div className="absolute inset-0 bg-black/60" />
         <Card className="max-w-2xl w-full bg-[#c6c6c6] border-4 border-black p-0 rounded-none relative z-10 shadow-[10px_10px_0_#000000]">
           <div className="bg-[#8b8b8b] p-3 border-b-4 border-black text-center">
@@ -314,7 +314,7 @@ export default function Game() {
   }
 
   return (
-    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center flex flex-col items-center p-4 font-body">
+    <div className="min-h-screen bg-[url('/assets/background.jpg')] bg-cover bg-center flex flex-col items-center p-4 font-body">
       <div className="absolute inset-0 bg-black/20 pointer-events-none" />
 
       {/* Header */}

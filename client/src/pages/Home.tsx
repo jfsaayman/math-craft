@@ -55,7 +55,7 @@ export default function Home() {
   const clearAll = () => setSelectedTables([]);
 
   return (
-    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center font-body flex flex-col items-center">
+    <div className="min-h-screen bg-[url('/assets/background.jpg')] bg-cover bg-center font-body flex flex-col items-center">
       <div className="absolute inset-0 bg-black/40 pointer-events-none" /> 
       
       <div className="relative z-10 container mx-auto px-4 py-8 flex flex-col items-center min-h-screen max-w-5xl">

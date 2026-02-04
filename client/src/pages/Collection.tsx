@@ -14,7 +14,7 @@ export default function Collection() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[url('/assets/background.png')] bg-cover bg-center font-body flex flex-col items-center p-4">
+    <div className="min-h-screen bg-[url('/assets/background.jpg')] bg-cover bg-center font-body flex flex-col items-center p-4">
       <div className="absolute inset-0 bg-black/40 pointer-events-none" />
 
       <div className="relative z-10 w-full max-w-4xl">
